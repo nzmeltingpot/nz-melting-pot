@@ -1,0 +1,26 @@
+{
+  "name": "NZ Melting Pot",
+  "short_name": "NZ Melting Pot",
+  "description": "Auckland's stage for every voice — two annual community music events.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFCF8",
+  "theme_color": "#D4532B",
+  "icons": [
+    {
+      "src": "/images/branding/logo-150x150.png",
+      "sizes": "150x150",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/branding/logo-300x300.png",
+      "sizes": "300x300",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/branding/logo-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

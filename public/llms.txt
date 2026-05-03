@@ -1,0 +1,36 @@
+# NZ Melting Pot — llms.txt
+# https://www.nzmeltingpot.com/
+
+## About
+NZ Melting Pot is a registered not-for-profit charity in Auckland, New Zealand, dedicated to bringing communities together through live music. The organisation hosts two annual community music events that are open to all ages, backgrounds, and skill levels.
+
+## Organisation Details
+- Type: Not-for-profit charity
+- Location: Auckland, New Zealand
+- Mission: To unite Auckland's diverse communities through live music events
+- Musical Talent Showcase: Performer registration fee $10 NZD Early Bird (until 1 June 2026), $15 NZD Standard (until 1 July 2026)
+- Musical Ensemble: Open to all musicians (small participation fee may apply)
+
+## Main Pages
+
+### Home (/)
+The main landing page featuring an overview of NZ Melting Pot, information about the organisation's mission, and registration for upcoming events. Includes details about the 2026 Musical Talent Showcase scheduled for 18 July 2026.
+
+### Musical Talent Showcase (/musical-talent-showcase)
+Information about the competitive annual event where performers sign up, select a category, and perform in front of live judges and an audience. Open to vocalists, instrumentalists, bands, and groups of all skill levels. The 2026 event is scheduled for Saturday, 18 July 2026.
+
+### Musical Ensemble (/musical-ensemble)
+Information about the collaborative annual event with no auditions or competition. Musicians from across Auckland come together to play, learn, and make music as a group. Photo gallery of past events included.
+
+## Key Facts
+- Both events have a small participation fee. The Musical Talent Showcase has a tiered performer registration fee ($10 NZD Early Bird, $15 NZD Standard)
+- No auditions required for the Musical Ensemble
+- Registration is open for performers at the Musical Talent Showcase, with online card payment via Stripe
+- Events celebrate Auckland's multicultural community through music
+- Both events are held annually in Auckland
+
+## Contact
+For more information about NZ Melting Pot and its events, visit https://www.nzmeltingpot.com/
+
+## Sitemap
+https://www.nzmeltingpot.com/sitemap.xml

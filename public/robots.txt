@@ -1,0 +1,22 @@
+# NZ Melting Pot — robots.txt
+User-agent: *
+Allow: /
+
+# AI crawlers — allow for visibility
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://www.nzmeltingpot.com/sitemap.xml
+Llms-txt: https://www.nzmeltingpot.com/llms.txt

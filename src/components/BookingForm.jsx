@@ -10,12 +10,9 @@ const COOLDOWN_MS = 30_000;
 const SETTINGS_TABLE_ID = 79250;
 
 /**
- * NEW Ezsite table needed for audience bookings.
- * 👉 When you create the table on Ezsite, replace this constant with the real ID.
- * For now, the form will still work locally (DEV_MOCK_STRIPE branch) but DB save
- * will fail gracefully on /booking-success.
+ * Audience-bookings table on Ezsite (created by Ezsite team).
  */
-const BOOKINGS_TABLE_ID = 0; // TODO: replace with real table ID from Ezsite
+const BOOKINGS_TABLE_ID = 82471;
 
 const PRICING = {
   TICKET_PRICE: 10,                          // NZD per audience ticket
@@ -193,17 +190,21 @@ export default function BookingForm() {
         return;
       }
 
-      // PRODUCTION
+      // PRODUCTION — invoke Ezsite Deno backend via apis.run()
       const origin = window.location.origin;
       const description = `Talent Showcase 2026 — ${ticketCount} audience ticket${ticketCount === 1 ? '' : 's'}`;
-      const { data, error } = await window.ezsite.apis.createStripeCheckout({
-        amount: totalAmount * 100,
-        currency: 'nzd',
-        registration_code: bookingRef,
-        customer_email: buyerEmail.trim(),
-        description,
-        success_url: `${origin}/booking-success?ref=${encodeURIComponent(bookingRef)}&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/payment-cancelled?ref=${encodeURIComponent(bookingRef)}`
+      const { data, error } = await window.ezsite.apis.run({
+        path: 'payment/createStripeCheckout',
+        methodName: 'createStripeCheckout',
+        param: [{
+          amount: totalAmount * 100,
+          currency: 'nzd',
+          registration_code: bookingRef,
+          customer_email: buyerEmail.trim(),
+          description,
+          success_url: `${origin}/booking-success?ref=${encodeURIComponent(bookingRef)}&session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${origin}/payment-cancelled?ref=${encodeURIComponent(bookingRef)}`
+        }]
       });
 
       if (error || !data?.url) {

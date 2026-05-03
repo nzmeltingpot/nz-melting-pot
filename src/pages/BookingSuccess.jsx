@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import usePageMeta from '../hooks/usePageMeta';
 import { buildBuyerConfirmationEmail, buildAdminBookingNotificationEmail } from '../utils/paymentEmails';
 
-const BOOKINGS_TABLE_ID = 0; // TODO: replace with the real Ezsite bookings table ID once created
+const BOOKINGS_TABLE_ID = 82471; // audience_bookings table on Ezsite
 const ADMIN_EMAIL = 'thenzmp@gmail.com';
 
 /**

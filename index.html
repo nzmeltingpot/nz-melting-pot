@@ -34,8 +34,8 @@
 	<body>
 		<div id="root"></div>
 
-		<!-- Dev Toolbar: Edit Mode + Save (dev only) -->
-		<div id="devToolbar" style="position:fixed;bottom:20px;right:20px;z-index:99999;display:flex;gap:8px;font-family:system-ui,sans-serif;">
+		<!-- Dev Toolbar: Edit Mode + Save — auto-hidden in production (only renders on localhost) -->
+		<div id="devToolbar" style="position:fixed;bottom:20px;right:20px;z-index:99999;display:none;gap:8px;font-family:system-ui,sans-serif;">
 			<button id="saveBtn" onclick="
 				if(window.__editSnapshot){
 					const changes=[];
@@ -88,6 +88,15 @@
 				transition:all .2s;
 			" title="Click to enable editing">✏️ Edit Mode</button>
 		</div>
+		<script>
+			// Only show the Edit Mode toolbar on localhost — never in production
+			(function () {
+				var h = window.location.hostname;
+				if (h === 'localhost' || h === '127.0.0.1' || h.startsWith('192.168.')) {
+					document.getElementById('devToolbar').style.display = 'flex';
+				}
+			})();
+		</script>
 		<noscript>
 			<div style="max-width:700px;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif">
 				<h1>NZ Melting Pot</h1>

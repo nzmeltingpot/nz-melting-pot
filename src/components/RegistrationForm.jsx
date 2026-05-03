@@ -339,18 +339,23 @@ export default function RegistrationForm({ idPrefix = 'form' }) {
         return;
       }
 
-      // 5. Production: ask Ezsite backend to create a Stripe Checkout Session
+      // 5. Production: ask Ezsite Deno backend to create a Stripe Checkout Session
+      // Ezsite invokes custom Deno functions via the generic apis.run() bridge.
       const origin = window.location.origin;
       const description = `Talent Showcase 2026 — ${category.charAt(0).toUpperCase() + category.slice(1)} (${numParticipants} × $${pricing.rate})`;
 
-      const { data: stripeData, error: stripeError } = await window.ezsite.apis.createStripeCheckout({
-        amount: totalFee * 100, // Stripe expects cents
-        currency: 'nzd',
-        registration_code: code,
-        customer_email: formData.email,
-        description,
-        success_url: `${origin}/payment-success?code=${encodeURIComponent(code)}&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/payment-cancelled?code=${encodeURIComponent(code)}`
+      const { data: stripeData, error: stripeError } = await window.ezsite.apis.run({
+        path: 'payment/createStripeCheckout',
+        methodName: 'createStripeCheckout',
+        param: [{
+          amount: totalFee * 100, // Stripe expects cents
+          currency: 'nzd',
+          registration_code: code,
+          customer_email: formData.email,
+          description,
+          success_url: `${origin}/payment-success?code=${encodeURIComponent(code)}&session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${origin}/payment-cancelled?code=${encodeURIComponent(code)}`
+        }]
       });
 
       if (stripeError || !stripeData?.url) {

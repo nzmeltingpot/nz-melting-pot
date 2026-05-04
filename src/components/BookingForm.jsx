@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
+import { createStripeCheckout } from '../utils/stripeClient';
 
 /* ============================================================================
    Audience Ticket Booking Form
@@ -190,21 +191,17 @@ export default function BookingForm() {
         return;
       }
 
-      // PRODUCTION — invoke Ezsite Deno backend via apis.run()
+      // PRODUCTION — call our Vercel backend
       const origin = window.location.origin;
       const description = `Talent Showcase 2026 — ${ticketCount} audience ticket${ticketCount === 1 ? '' : 's'}`;
-      const { data, error } = await window.ezsite.apis.run({
-        path: 'payment/createStripeCheckout',
-        methodName: 'createStripeCheckout',
-        param: [{
-          amount: totalAmount * 100,
-          currency: 'nzd',
-          registration_code: bookingRef,
-          customer_email: buyerEmail.trim(),
-          description,
-          success_url: `${origin}/booking-success?ref=${encodeURIComponent(bookingRef)}&session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${origin}/payment-cancelled?ref=${encodeURIComponent(bookingRef)}`
-        }]
+      const { data, error } = await createStripeCheckout({
+        amount: totalAmount * 100,
+        currency: 'nzd',
+        registration_code: bookingRef,
+        customer_email: buyerEmail.trim(),
+        description,
+        success_url: `${origin}/booking-success?ref=${encodeURIComponent(bookingRef)}&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/payment-cancelled?ref=${encodeURIComponent(bookingRef)}`
       });
 
       if (error || !data?.url) {

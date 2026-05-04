@@ -38,9 +38,9 @@ export default function Home() {
               <span className="hero__line"><em>NZ Melting Pot.</em></span>
             </h1>
             <p className="my-[25px] px-[0px] mx-[0px] py-[0px] hero__tagline">Enabling excellence by fostering unity and inclusivity in New Zealand's diverse society</p>
-            <p className="text-[21px] my-[9px] hero__subtitle">NZ Melting Pot is a not-for-profit charity that brings Auckland's communities together through  music. Two events. All backgrounds. No barriers.</p>
+            <p className="text-[21px] my-[9px] hero__subtitle">NZ Melting Pot is a not-for-profit charity that brings Auckland's communities together through music. Two events. All backgrounds. No barriers.</p>
             <div className="hero__actions">
-              <a href="#register" className="btn btn--primary btn--large" onClick={(e) => {e.preventDefault();document.getElementById('register')?.scrollIntoView({ behavior: 'smooth' });}}>Register for the Talent Showcase  2026</a>
+              <a href="#register" className="btn btn--primary btn--large" onClick={(e) => {e.preventDefault();document.getElementById('register')?.scrollIntoView({ behavior: 'smooth' });}}>Register for the Talent Showcase 2026</a>
               <a href="#events" className="btn btn--outline btn--large" onClick={(e) => {e.preventDefault();document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' });}}>Our Events</a>
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function Home() {
                 <AnimatedIcon name="notes" />
               </div>
               <h3>Two Events, One Goal</h3>
-              <p className="">The <strong>Musical Talent Showcase</strong> is not competitive. The <strong>Musical Ensemble</strong> is collaborative. Both are annual events, and both are open to everyone.</p>
+              <p className="">The <strong>Musical Talent Showcase</strong> is our flagship event with live judges and an audience. The <strong>Musical Ensemble</strong> is relaxed and collaborative — no auditions, no competition. Both are annual, and both are open to everyone.</p>
             </div>
             <div className="highlight-card reveal" data-delay="240">
               <div className="highlight-card__icon highlight-card__icon--gold">
@@ -189,7 +189,7 @@ export default function Home() {
                 </li>
                 <li>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                  <span className=""><strong>Venue:</strong> Auckland — venue details-----   524 Blockhouse Bay Road, Blockhouse Bay, Auckland 0600 </span>
+                  <span className=""><strong>Venue:</strong> 524 Blockhouse Bay Road, Blockhouse Bay, Auckland 0600</span>
                 </li>
                 <li>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" /><path d="M13 5v2M13 17v2M13 11v2" /></svg>

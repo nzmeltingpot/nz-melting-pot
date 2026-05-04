@@ -153,11 +153,11 @@ export default function MusicalEnsemble() {
               <h3>Event Details</h3>
               <div className="info-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
-                <div><strong>When</strong><span className="">Annual — date announced each year  28/11/2026</span></div>
+                <div><strong>When</strong><span>Annual event — next on 28/11/2026</span></div>
               </div>
               <div className="info-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                <div><strong>Where</strong><span className="">Blockhouse Bay Community CentreAuckland — venue varies</span></div>
+                <div><strong>Where</strong><span className="">Blockhouse Bay Community Centre, Auckland</span></div>
               </div>
               <div className="info-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></svg>

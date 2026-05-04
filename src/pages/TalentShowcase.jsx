@@ -146,11 +146,11 @@ export default function TalentShowcase() {
               </div>
               <div className="info-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
-                <div><strong>Time</strong><span className="">Doors open TBA </span></div>
+                <div><strong>Time</strong><span className="">Doors open TBA</span></div>
               </div>
               <div className="info-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                <div><strong>Venue</strong><span className="">Auckland — </span></div>
+                <div><strong>Venue</strong><span className="">Auckland — venue TBA</span></div>
               </div>
               <div className="info-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" /><path d="M13 5v2M13 17v2M13 11v2" /></svg>

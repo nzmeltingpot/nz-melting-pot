@@ -41,26 +41,8 @@ export default function BookTickets() {
         </div>
       </section>
 
-      {/* What to expect */}
-      <section className="section" style={{ paddingTop: 32, paddingBottom: 40 }}>
-        <div className="container">
-          <div className="reveal" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: 20,
-            maxWidth: 980,
-            margin: '0 auto 36px'
-          }}>
-            <FeatureCard icon="🎤" title="Live performances" text="Solo vocalists, instrumentalists, duos and groups across all ages." />
-            <FeatureCard icon="🏆" title="Live judges" text="A panel of judges and audience celebrating Auckland's musical talent." />
-            <FeatureCard icon="👨‍👩‍👧‍👦" title="Family friendly" text="Open to all ages — bring family and friends." />
-            <FeatureCard icon="🎟️" title="Easy entry" text="Tickets emailed to you instantly after payment. Show on your phone or print." />
-          </div>
-        </div>
-      </section>
-
       {/* The booking form */}
-      <section id="booking-form" className="section" style={{ paddingTop: 0, paddingBottom: 80 }}>
+      <section id="booking-form" className="section" style={{ paddingTop: 24, paddingBottom: 80 }}>
         <div className="container" style={{ maxWidth: 760 }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 28 }}>
             <h2 style={{ fontFamily: "'Cormorant', Georgia, serif", fontSize: 'clamp(2rem, 4vw, 2.6rem)', margin: '0 0 8px 0' }}>
@@ -80,18 +62,3 @@ export default function BookTickets() {
   );
 }
 
-function FeatureCard({ icon, title, text }) {
-  return (
-    <div style={{
-      background: 'rgba(255,255,255,0.04)',
-      border: '1px solid rgba(255,255,255,0.10)',
-      borderRadius: 12,
-      padding: '20px 18px',
-      textAlign: 'center'
-    }}>
-      <div style={{ fontSize: '2rem', marginBottom: 10 }}>{icon}</div>
-      <h3 style={{ fontSize: '1.05rem', margin: '0 0 6px 0', color: '#fff' }}>{title}</h3>
-      <p style={{ fontSize: '0.86rem', color: 'rgba(255,255,255,0.78)', lineHeight: 1.55, margin: 0 }}>{text}</p>
-    </div>
-  );
-}

@@ -31,14 +31,91 @@ export default function Contact() {
     setLoading(true);
     setStatus({ type: '', message: '' });
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const ADMIN_EMAIL = 'thenzmp@gmail.com';
+    const FROM_ADDRESS = 'NZ Melting Pot Contact <noreply@nzmeltingpot.com>';
 
-    setStatus({
-      type: 'success',
-      message: 'Thank you for your message! We\'ll get back to you soon.'
-    });
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    // Build the admin-facing email (someone wrote to us)
+    const subjectMap = {
+      general: 'General Inquiry',
+      events: 'Event Information',
+      volunteer: 'Volunteering',
+      partnership: 'Partnership / Sponsorship',
+      media: 'Media Inquiry',
+      other: 'Other'
+    };
+    const subjectLabel = subjectMap[formData.subject] || formData.subject;
+
+    const escapeHtml = (s) => String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const messageHtml = escapeHtml(formData.message).replace(/\n/g, '<br/>');
+
+    try {
+      // 1. Send the message to the admin
+      const adminResult = await window.ezsite.apis.sendEmail({
+        from: FROM_ADDRESS,
+        to: [ADMIN_EMAIL],
+        replyTo: [formData.email.trim()],
+        subject: `Contact form — ${subjectLabel} (from ${formData.name.trim()})`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width:640px; margin:0 auto; padding:20px; color:#1f2937;">
+            <h2 style="color:#7B1E2D; margin:0 0 8px 0;">📨 New Contact Form Message</h2>
+            <p style="color:#6b7280; font-size:14px; margin:0 0 20px 0;">
+              Someone has just sent a message via the contact page on nzmeltingpot.com.
+            </p>
+            <table style="width:100%; border-collapse:collapse; background:#fff; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; font-size:14px;">
+              <tr><td style="padding:10px 14px; font-weight:600; color:#374151; width:140px; border-bottom:1px solid #e5e7eb;">Name</td><td style="padding:10px 14px; color:#1f2937; border-bottom:1px solid #e5e7eb;">${escapeHtml(formData.name)}</td></tr>
+              <tr><td style="padding:10px 14px; font-weight:600; color:#374151; border-bottom:1px solid #e5e7eb;">Email</td><td style="padding:10px 14px; color:#1f2937; border-bottom:1px solid #e5e7eb;"><a href="mailto:${escapeHtml(formData.email)}" style="color:#7B1E2D;">${escapeHtml(formData.email)}</a></td></tr>
+              <tr><td style="padding:10px 14px; font-weight:600; color:#374151; border-bottom:1px solid #e5e7eb;">Subject</td><td style="padding:10px 14px; color:#1f2937; border-bottom:1px solid #e5e7eb;">${escapeHtml(subjectLabel)}</td></tr>
+              <tr><td style="padding:10px 14px; font-weight:600; color:#374151; vertical-align:top;">Message</td><td style="padding:10px 14px; color:#1f2937; line-height:1.6;">${messageHtml}</td></tr>
+            </table>
+            <p style="color:#9ca3af; font-size:12px; margin-top:20px;">Reply directly to this email to respond — the sender's address is set as Reply-To.</p>
+          </div>
+        `
+      });
+
+      if (adminResult?.error) {
+        throw new Error(adminResult.error);
+      }
+
+      // 2. Send a confirmation to the sender (best-effort — don't fail the whole flow if this errors)
+      try {
+        await window.ezsite.apis.sendEmail({
+          from: FROM_ADDRESS,
+          to: [formData.email.trim()],
+          subject: 'Thanks for contacting NZ Melting Pot',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width:600px; margin:0 auto; padding:20px; color:#2d3748;">
+              <p>Hi ${escapeHtml(formData.name)},</p>
+              <p>Thank you for getting in touch with NZ Melting Pot. We've received your message and will get back to you within 48 hours.</p>
+              <div style="background:#f9fafb; border-left:4px solid #7B1E2D; padding:12px 16px; margin:18px 0; font-size:13px; color:#374151;">
+                <strong>Your message (${escapeHtml(subjectLabel)}):</strong><br/>
+                <span style="white-space:pre-wrap;">${messageHtml}</span>
+              </div>
+              <p>Warm regards,<br/>The NZ Melting Pot Team</p>
+              <hr style="border:none; border-top:1px solid #e2e8f0; margin:20px 0;"/>
+              <p style="font-size:11px; color:#a0aec0;">NZ Melting Pot · Auckland, New Zealand · <a href="https://www.nzmeltingpot.com" style="color:#a0aec0;">www.nzmeltingpot.com</a></p>
+            </div>
+          `
+        });
+      } catch (confirmErr) {
+        console.warn('Confirmation email to user failed (non-blocking):', confirmErr);
+      }
+
+      setStatus({
+        type: 'success',
+        message: "Thank you for your message! We've received it and will get back to you within 48 hours."
+      });
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (err) {
+      console.error('Contact form submit failed:', err);
+      setStatus({
+        type: 'error',
+        message: 'Sorry — something went wrong sending your message. Please email us directly at info@nzmeltingpot.com.'
+      });
+    }
+
     setLoading(false);
   };
 
@@ -97,7 +174,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3>Email</h3>
-                    <p>info@nzmeltingpot.org.nz</p>
+                    <p><a href="mailto:info@nzmeltingpot.com" style={{ color: 'inherit', textDecoration: 'none' }}>info@nzmeltingpot.com</a></p>
                   </div>
                 </div>
 

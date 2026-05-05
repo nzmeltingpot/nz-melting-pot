@@ -66,6 +66,16 @@ export default function Footer() {
         <div className="footer__bottom">
           <span>&copy; {new Date().getFullYear()} NZ Melting Pot. All rights reserved.</span>
           <span>A registered New Zealand charity</span>
+          <span style={{ opacity: 0.7 }}>
+            Website by{' '}
+            <a
+              href="https://websmarthq.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+              Web Smart HQ
+            </a>
+          </span>
           {isAdmin &&
           <Link to="/admin" className="footer__admin-link">Site Admin</Link>
           }

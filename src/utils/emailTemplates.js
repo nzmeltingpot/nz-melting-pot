@@ -183,8 +183,11 @@ export function generateNewsletterEmail({
                 ·
                 <a href="${SITE_URL}/contact" style="color: #9ca3af; text-decoration: none;">Contact</a>
               </p>
-              <p style="margin: 0; font-size: 10px; color: #6b7280;">
+              <p style="margin: 0 0 6px; font-size: 10px; color: #6b7280;">
                 © ${new Date().getFullYear()} ${siteName}. All rights reserved.
+              </p>
+              <p style="margin: 0; font-size: 10px; color: #6b7280;">
+                Website by <a href="https://websmarthq.com/" style="color: #9ca3af; text-decoration: underline;">Web Smart HQ</a>
               </p>
             </td>
           </tr>
@@ -222,6 +225,7 @@ www.jrfinance.co.nz
 
 ${siteName}  ·  www.nzmeltingpot.com
 © ${new Date().getFullYear()} ${siteName}. All rights reserved.
+Website by Web Smart HQ — https://websmarthq.com
   `.trim();
 
   return { subject, html, text };

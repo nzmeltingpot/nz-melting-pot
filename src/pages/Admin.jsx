@@ -86,6 +86,8 @@ export default function Admin() {
   const [membersPage, setMembersPage] = useState(1);
   const [membersTotal, setMembersTotal] = useState(0);
   const [membersPageSize] = useState(50);
+  const [membersSearch, setMembersSearch] = useState('');
+  const [membersSearchInput, setMembersSearchInput] = useState('');
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
   const [selectedMembers, setSelectedMembers] = useState(new Set());
@@ -188,15 +190,24 @@ export default function Admin() {
     if (user) loadSettings();
   }, [user, loadSettings]);
 
-  const loadMembers = useCallback(async (page = 1) => {
+  const loadMembers = useCallback(async (page = 1, search = '') => {
     setLoadingMembers(true);
     try {
-      const { data, error } = await window.ezsite.apis.tablePage(MEMBERS_TABLE_ID, {
+      const query = {
         PageNo: page,
         PageSize: membersPageSize,
         OrderByField: 'email',
         IsAsc: true
-      });
+      };
+      // Add server-side filter for email OR full_name when a search term is present.
+      // Ezsite tablePage Filters use Op: 'StringContains' for partial matches.
+      const term = (search || '').trim();
+      if (term) {
+        query.Filters = [
+          { Name: 'email', Op: 'StringContains', Value: term }
+        ];
+      }
+      const { data, error } = await window.ezsite.apis.tablePage(MEMBERS_TABLE_ID, query);
       if (!error && data?.List) {
         setMembers(data.List);
         setMembersTotal(data.VirtualCount || data.TotalCount || 0);
@@ -210,9 +221,9 @@ export default function Admin() {
 
   useEffect(() => {
     if (user && activeTab === 'members') {
-      loadMembers(1);
+      loadMembers(1, membersSearch);
     }
-  }, [user, activeTab, loadMembers]);
+  }, [user, activeTab, loadMembers, membersSearch]);
 
   // Dashboard data loader
   const loadDashboard = useCallback(async () => {
@@ -284,7 +295,7 @@ export default function Admin() {
         unsubscribed_date: new Date().toISOString()
       });
       if (error) throw new Error(error);
-      loadMembers(membersPage);
+      loadMembers(membersPage, membersSearch);
     } catch (err) {
       alert('Failed to update: ' + (err.message || 'Unknown error'));
     }
@@ -298,7 +309,7 @@ export default function Admin() {
         unsubscribed_date: ''
       });
       if (error) throw new Error(error);
-      loadMembers(membersPage);
+      loadMembers(membersPage, membersSearch);
     } catch (err) {
       alert('Failed to update: ' + (err.message || 'Unknown error'));
     }
@@ -311,7 +322,7 @@ export default function Admin() {
         ID: member.id || member.ID
       });
       if (error) throw new Error(error);
-      loadMembers(membersPage);
+      loadMembers(membersPage, membersSearch);
     } catch (err) {
       alert('Failed to delete: ' + (err.message || 'Unknown error'));
     }
@@ -388,7 +399,7 @@ export default function Admin() {
       } else {
         alert(`Successfully updated ${data} records to "Member"`);
         // Refresh the members list
-        loadMembers();
+        loadMembers(1, membersSearch);
       }
     } catch (err) {
       alert('Bulk update error: ' + (err.message || 'Unknown error'));
@@ -670,7 +681,7 @@ export default function Admin() {
       });
 
       // Refresh the members list
-      loadMembers(1);
+      loadMembers(1, membersSearch);
 
     } catch (err) {
       setImportResult({ success: false, message: 'Failed to parse CSV: ' + (err.message || 'Unknown error') });
@@ -1205,6 +1216,87 @@ export default function Admin() {
               </div>
             </div>
 
+            {/* Search box */}
+            <div style={{ marginBottom: 16, position: 'relative' }}>
+              <svg
+                width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af"
+                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                type="text"
+                value={membersSearchInput}
+                onChange={(e) => {
+                  setMembersSearchInput(e.target.value);
+                  // Debounce: only fire the actual search 350ms after the user stops typing
+                  clearTimeout(window.__membersSearchDebounce);
+                  window.__membersSearchDebounce = setTimeout(() => {
+                    setMembersSearch(e.target.value.trim());
+                  }, 350);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    clearTimeout(window.__membersSearchDebounce);
+                    setMembersSearch(membersSearchInput.trim());
+                  } else if (e.key === 'Escape') {
+                    setMembersSearchInput('');
+                    setMembersSearch('');
+                  }
+                }}
+                placeholder="Search by email…"
+                style={{
+                  width: '100%',
+                  padding: '10px 38px 10px 38px',
+                  border: '1.5px solid #E6DDD3',
+                  borderRadius: 8,
+                  fontSize: '0.9rem',
+                  background: '#FFFCF8',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }} />
+              {membersSearchInput && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMembersSearchInput('');
+                    setMembersSearch('');
+                  }}
+                  aria-label="Clear search"
+                  style={{
+                    position: 'absolute',
+                    right: 10,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: '#9ca3af',
+                    cursor: 'pointer',
+                    fontSize: '1.1rem',
+                    lineHeight: 1,
+                    padding: 4
+                  }}>
+                  ×
+                </button>
+              )}
+              {membersSearch && (
+                <p style={{ margin: '8px 0 0 4px', fontSize: '0.78rem', color: '#7B1E2D' }}>
+                  Showing results matching <strong>"{membersSearch}"</strong>
+                  {' · '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMembersSearchInput('');
+                      setMembersSearch('');
+                    }}
+                    style={{ background: 'none', border: 'none', color: '#7B1E2D', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.78rem', padding: 0 }}>
+                    clear
+                  </button>
+                </p>
+              )}
+            </div>
+
             {importResult &&
           <div style={{
             padding: '12px 16px',
@@ -1331,7 +1423,7 @@ export default function Admin() {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 20 }}>
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                       <button
-                  onClick={() => loadMembers(1)}
+                  onClick={() => loadMembers(1, membersSearch)}
                   disabled={membersPage <= 1}
                   style={{
                     ...styles.paginationBtn,
@@ -1341,7 +1433,7 @@ export default function Admin() {
                         ⏮ First
                       </button>
                       <button
-                  onClick={() => loadMembers(membersPage - 1)}
+                  onClick={() => loadMembers(membersPage - 1, membersSearch)}
                   disabled={membersPage <= 1}
                   style={{
                     ...styles.paginationBtn,
@@ -1363,7 +1455,7 @@ export default function Admin() {
 
                   if (start > 1) {
                     pages.push(
-                      <button key={1} onClick={() => loadMembers(1)} style={styles.pageNumBtn}>1</button>
+                      <button key={1} onClick={() => loadMembers(1, membersSearch)} style={styles.pageNumBtn}>1</button>
                     );
                     if (start > 2) pages.push(<span key="dots1" style={{ color: '#666' }}>...</span>);
                   }
@@ -1372,7 +1464,7 @@ export default function Admin() {
                     pages.push(
                       <button
                         key={i}
-                        onClick={() => loadMembers(i)}
+                        onClick={() => loadMembers(i, membersSearch)}
                         style={{
                           ...styles.pageNumBtn,
                           background: i === membersPage ? '#c9a227' : 'transparent',
@@ -1388,7 +1480,7 @@ export default function Admin() {
                   if (end < totalMembersPages) {
                     if (end < totalMembersPages - 1) pages.push(<span key="dots2" style={{ color: '#666' }}>...</span>);
                     pages.push(
-                      <button key={totalMembersPages} onClick={() => loadMembers(totalMembersPages)} style={styles.pageNumBtn}>{totalMembersPages}</button>
+                      <button key={totalMembersPages} onClick={() => loadMembers(totalMembersPages, membersSearch)} style={styles.pageNumBtn}>{totalMembersPages}</button>
                     );
                   }
 
@@ -1396,7 +1488,7 @@ export default function Admin() {
                 })()}
 
                       <button
-                  onClick={() => loadMembers(membersPage + 1)}
+                  onClick={() => loadMembers(membersPage + 1, membersSearch)}
                   disabled={membersPage >= totalMembersPages}
                   style={{
                     ...styles.paginationBtn,
@@ -1406,7 +1498,7 @@ export default function Admin() {
                         Next →
                       </button>
                       <button
-                  onClick={() => loadMembers(totalMembersPages)}
+                  onClick={() => loadMembers(totalMembersPages, membersSearch)}
                   disabled={membersPage >= totalMembersPages}
                   style={{
                     ...styles.paginationBtn,

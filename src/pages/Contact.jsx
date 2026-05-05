@@ -31,7 +31,7 @@ export default function Contact() {
     setLoading(true);
     setStatus({ type: '', message: '' });
 
-    const ADMIN_EMAIL = 'thenzmp@gmail.com';
+    const ADMIN_EMAILS = ['thenzmp@gmail.com', 'gragmire@gmail.com'];
     const FROM_ADDRESS = 'NZ Melting Pot Contact <noreply@nzmeltingpot.com>';
 
     // Build the admin-facing email (someone wrote to us)
@@ -55,7 +55,7 @@ export default function Contact() {
       // 1. Send the message to the admin
       const adminResult = await window.ezsite.apis.sendEmail({
         from: FROM_ADDRESS,
-        to: [ADMIN_EMAIL],
+        to: ADMIN_EMAILS,
         replyTo: [formData.email.trim()],
         subject: `Contact form — ${subjectLabel} (from ${formData.name.trim()})`,
         html: `

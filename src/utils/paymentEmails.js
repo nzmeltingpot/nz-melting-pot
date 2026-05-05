@@ -6,7 +6,7 @@
 const SITE_URL = 'https://www.nzmeltingpot.com';
 const LOGO_URL = `${SITE_URL}/images/branding/logo-300x300.png`;
 const EVENT_DATE = 'Saturday, 18 July 2026';
-const EVENT_VENUE = 'Auckland (venue TBA)';
+const EVENT_VENUE = 'Blockhouse Bay Community Centre, 524 Blockhouse Bay Road, Blockhouse Bay, Auckland 0600';
 
 /** Minimal HTML escape — protects against template injection from user-supplied fields. */
 function escapeHtml(s) {

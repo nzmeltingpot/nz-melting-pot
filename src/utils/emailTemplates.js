@@ -17,11 +17,15 @@ const COLOR_MUTED = '#6b7280';
 
 /**
  * Reusable JR Finance sponsor footer block.
- * Compact / non-clickable — keeps the focus on NZMP while still acknowledging the sponsor.
+ * Whole card is a single link that opens the NZMP Talent Showcase page,
+ * scrolling directly to the sponsor banner there. From there, recipients
+ * can click through to JR Finance themselves.
  */
 function buildSponsorBlock() {
+  const sponsorBannerUrl = `${SITE_URL}/musical-talent-showcase#sponsor`;
+
   return `
-    <!-- Sponsor section (compact, non-clickable) -->
+    <!-- Sponsor section (compact, whole card links back to NZMP sponsor banner) -->
     <tr>
       <td style="padding: 18px 40px 4px;">
         <p style="margin: 0; text-align: center; font-size: 10px; color: ${COLOR_MUTED}; letter-spacing: 2px; text-transform: uppercase; font-family: Arial, Helvetica, sans-serif;">
@@ -31,24 +35,26 @@ function buildSponsorBlock() {
     </tr>
     <tr>
       <td style="padding: 4px 40px 18px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; font-family: Arial, Helvetica, sans-serif;">
-          <tr>
-            <!-- JR Finance brand -->
-            <td style="padding:12px 16px; vertical-align:middle; width:120px; border-right:1px solid #e2e8f0; text-align:center;">
-              <div style="font-family:'Georgia', serif; font-size:20px; font-weight:bold; color:#3b6db8; letter-spacing:1px; line-height:1;">JR</div>
-              <div style="font-family:'Georgia', serif; font-size:10px; color:#3b6db8; letter-spacing:2px; margin-top:2px;">FINANCE</div>
-              <div style="font-size:8px; color:#6b86b3; letter-spacing:1px; margin-top:4px; text-transform:lowercase;">create wealth</div>
-            </td>
-            <!-- Contact details (plain text, not links) -->
-            <td style="padding:12px 16px; vertical-align:middle; font-size:11px; color:#374151; line-height:1.5;">
-              <div style="font-weight:bold; font-size:12px; color:#1f2937; letter-spacing:0.3px;">JOHNRAE TANNEN</div>
-              <div style="color:#6b86b3; font-size:10px; margin-bottom:6px;">Financial Advisor</div>
-              <div style="color:#374151;">+64 27-283-1946 &nbsp;·&nbsp; johnrae@jrfinance.co.nz</div>
-              <div style="color:#374151;">www.jrfinance.co.nz</div>
-              <div style="color:#6b7280; font-size:10px; margin-top:2px;">1A/268 Manukau Road, Epsom, Auckland 1023</div>
-            </td>
-          </tr>
-        </table>
+        <a href="${sponsorBannerUrl}" target="_blank" rel="noopener noreferrer" style="display:block; text-decoration:none; color:inherit;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; font-family: Arial, Helvetica, sans-serif;">
+            <tr>
+              <!-- JR Finance brand -->
+              <td style="padding:12px 16px; vertical-align:middle; width:120px; border-right:1px solid #e2e8f0; text-align:center;">
+                <div style="font-family:'Georgia', serif; font-size:20px; font-weight:bold; color:#3b6db8; letter-spacing:1px; line-height:1;">JR</div>
+                <div style="font-family:'Georgia', serif; font-size:10px; color:#3b6db8; letter-spacing:2px; margin-top:2px;">FINANCE</div>
+                <div style="font-size:8px; color:#6b86b3; letter-spacing:1px; margin-top:4px; text-transform:lowercase;">create wealth</div>
+              </td>
+              <!-- Contact details (plain text, not separately clickable — the whole card is the link) -->
+              <td style="padding:12px 16px; vertical-align:middle; font-size:11px; color:#374151; line-height:1.5;">
+                <div style="font-weight:bold; font-size:12px; color:#1f2937; letter-spacing:0.3px;">JOHNRAE TANNEN</div>
+                <div style="color:#6b86b3; font-size:10px; margin-bottom:6px;">Financial Advisor</div>
+                <div style="color:#374151;">+64 27-283-1946 &nbsp;·&nbsp; johnrae@jrfinance.co.nz</div>
+                <div style="color:#374151;">www.jrfinance.co.nz</div>
+                <div style="color:#6b7280; font-size:10px; margin-top:2px;">1A/268 Manukau Road, Epsom, Auckland 1023</div>
+              </td>
+            </tr>
+          </table>
+        </a>
       </td>
     </tr>`;
 }

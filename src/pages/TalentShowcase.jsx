@@ -173,46 +173,8 @@ export default function TalentShowcase() {
         </div>
       </section>
 
-      {/* Registration Form */}
-      <section className="register-section" id="register">
-        <div className="divider divider--top">
-          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" fill="var(--color-white)">
-            <path d="M0,40 C480,0 960,55 1440,15 L1440,0 L0,0 Z" />
-          </svg>
-        </div>
-        <div className="container container--narrow">
-          <div className="register-section__header reveal">
-            <p className="text-accent">Registrations Open</p>
-            <h2>Sign Up for 2026</h2>
-            <p>Fill in your details below and we'll confirm your spot. Performer fee: $10 (Early Bird) / $15 (Standard) per participant — see pricing details on the form below.</p>
-          </div>
-          <div className="reveal" data-delay="150">
-            <RegistrationForm idPrefix="tsc" />
-          </div>
-        </div>
-        <div className="divider divider--bottom">
-          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" fill="var(--color-sand)">
-            <path d="M0,10 C360,55 900,0 1440,35 L1440,60 L0,60 Z" />
-          </svg>
-        </div>
-      </section>
-
-      {/* Gallery */}
-      <section className="gallery-section" id="gallery">
-        <div className="container container--wide">
-          <div className="gallery-section__header reveal">
-            <p className="text-accent">From Previous Years</p>
-            <h2>Gallery</h2>
-            <p>Moments from the stage — performers, judges, and the crowd that makes it all happen.</p>
-          </div>
-          <div className="reveal" data-delay="100">
-            <Gallery images={showcaseImages} />
-          </div>
-        </div>
-      </section>
-
-      {/* Sponsor banner — clickable, links to JR Finance */}
-      <section style={{ padding: '60px 20px 20px', background: 'var(--color-cream, #FBF5ED)' }}>
+      {/* Sponsor banner — placed just above the Sign-Up section */}
+      <section id="sponsor" style={{ padding: '40px 20px 24px', background: 'var(--color-cream, #FBF5ED)' }}>
         <div className="container reveal" style={{ maxWidth: 900 }}>
           <p style={{
             textAlign: 'center',
@@ -248,14 +210,14 @@ export default function TalentShowcase() {
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '0 4px 16px rgba(30, 25, 21, 0.06)';
-            }}
-          >
+            }}>
+
             <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: 28,
               flexWrap: 'wrap',
-              justifyContent: 'space-between'
+              justifyContent: 'center'
             }}>
               {/* JR Finance brand mark */}
               <div style={{ flex: '0 0 auto', textAlign: 'center', minWidth: 120 }}>
@@ -264,7 +226,7 @@ export default function TalentShowcase() {
                 <div style={{ fontSize: 10, color: '#6b86b3', letterSpacing: 1.5, marginTop: 6, textTransform: 'lowercase' }}>create wealth</div>
               </div>
 
-              {/* Vertical divider — only shows on wider screens */}
+              {/* Vertical divider */}
               <div style={{ width: 1, alignSelf: 'stretch', background: '#e2e8f0', flex: '0 0 1px' }} aria-hidden="true" />
 
               {/* Advisor details */}
@@ -274,25 +236,46 @@ export default function TalentShowcase() {
                 <div>+64 27-283-1946 &nbsp;·&nbsp; johnrae@jrfinance.co.nz</div>
                 <div style={{ color: '#6b7280', fontSize: '0.85rem', marginTop: 2 }}>1A/268 Manukau Road, Epsom, Auckland 1023</div>
               </div>
-
-              {/* CTA */}
-              <div style={{ flex: '0 0 auto' }}>
-                <span style={{
-                  display: 'inline-block',
-                  padding: '10px 20px',
-                  background: '#3b6db8',
-                  color: '#fff',
-                  borderRadius: 25,
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  letterSpacing: 0.3,
-                  whiteSpace: 'nowrap'
-                }}>
-                  Visit Website →
-                </span>
-              </div>
             </div>
           </a>
+        </div>
+      </section>
+
+      {/* Registration Form */}
+      <section className="register-section" id="register">
+        <div className="divider divider--top">
+          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" fill="var(--color-white)">
+            <path d="M0,40 C480,0 960,55 1440,15 L1440,0 L0,0 Z" />
+          </svg>
+        </div>
+        <div className="container container--narrow">
+          <div className="register-section__header reveal">
+            <p className="text-accent">Registrations Open</p>
+            <h2>Sign Up for 2026</h2>
+            <p>Fill in your details below and we'll confirm your spot. Performer fee: $10 (Early Bird) / $15 (Standard) per participant — see pricing details on the form below.</p>
+          </div>
+          <div className="reveal" data-delay="150">
+            <RegistrationForm idPrefix="tsc" />
+          </div>
+        </div>
+        <div className="divider divider--bottom">
+          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" fill="var(--color-sand)">
+            <path d="M0,10 C360,55 900,0 1440,35 L1440,60 L0,60 Z" />
+          </svg>
+        </div>
+      </section>
+
+      {/* Gallery */}
+      <section className="gallery-section" id="gallery">
+        <div className="container container--wide">
+          <div className="gallery-section__header reveal">
+            <p className="text-accent">From Previous Years</p>
+            <h2>Gallery</h2>
+            <p>Moments from the stage — performers, judges, and the crowd that makes it all happen.</p>
+          </div>
+          <div className="reveal" data-delay="100">
+            <Gallery images={showcaseImages} />
+          </div>
         </div>
       </section>
 

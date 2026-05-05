@@ -22,6 +22,29 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="container">
+        {/* Designer credit — top of footer, white text on dark background */}
+        <div style={{
+          textAlign: 'center',
+          padding: '14px 16px 4px',
+          fontSize: '0.85rem',
+          color: '#ffffff',
+          letterSpacing: '0.5px'
+        }}>
+          Website by{' '}
+          <a
+            href="https://websmarthq.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: '#ffffff',
+              fontWeight: 600,
+              textDecoration: 'underline',
+              textUnderlineOffset: '3px'
+            }}>
+            Web Smart HQ
+          </a>
+        </div>
+
         {/* Large typographic lockup */}
         <div className="footer__marquee" aria-hidden="true">
           <p className="footer__marquee-text">
@@ -66,16 +89,6 @@ export default function Footer() {
         <div className="footer__bottom">
           <span>&copy; {new Date().getFullYear()} NZ Melting Pot. All rights reserved.</span>
           <span>A registered New Zealand charity</span>
-          <span style={{ opacity: 0.7 }}>
-            Website by{' '}
-            <a
-              href="https://websmarthq.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
-              Web Smart HQ
-            </a>
-          </span>
           {isAdmin &&
           <Link to="/admin" className="footer__admin-link">Site Admin</Link>
           }

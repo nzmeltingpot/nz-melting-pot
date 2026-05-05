@@ -112,53 +112,200 @@ img = Image.composite(Image.new("RGB", (W, H), DEEP_CREAM), img, grain)
 
 draw = ImageDraw.Draw(img, "RGBA")
 
-# Outer frame
+# ---------------------------------------------------------------------------
+# Multi-line letterpress border (gold + maroon, accentuated like the reference)
+# ---------------------------------------------------------------------------
 margin = 90
-draw.rectangle([margin, margin, W - margin, H - margin], outline=GOLD + (255,), width=3)
-draw.rectangle([margin + 14, margin + 14, W - margin - 14, H - margin - 14], outline=GOLD + (140,), width=1)
+# 1. Outermost thick maroon rule
+draw.rectangle([margin, margin, W - margin, H - margin], outline=MAROON + (255,), width=8)
+# 2. Inner gold rule
+gap1 = 22
+draw.rectangle([margin + gap1, margin + gap1, W - margin - gap1, H - margin - gap1], outline=GOLD + (255,), width=4)
+# 3. Hairline maroon
+gap2 = gap1 + 14
+draw.rectangle([margin + gap2, margin + gap2, W - margin - gap2, H - margin - gap2], outline=MAROON + (200,), width=1)
+# 4. Innermost faint gold rule (the working frame)
+gap3 = gap2 + 12
+draw.rectangle([margin + gap3, margin + gap3, W - margin - gap3, H - margin - gap3], outline=GOLD + (110,), width=1)
+
+# Decorative diamonds at the four corners of the maroon hairline frame
+for cx, cy in [
+    (margin + gap2, margin + gap2),
+    (W - margin - gap2, margin + gap2),
+    (margin + gap2, H - margin - gap2),
+    (W - margin - gap2, H - margin - gap2),
+]:
+    draw_diamond(draw, cx, cy, 9, fill=GOLD)
+    draw_diamond(draw, cx, cy, 4, fill=MAROON)
+
+# Tiny diamond ornaments at the midpoint of each outer edge
+for cx, cy in [
+    (W // 2, margin + gap2),
+    (W // 2, H - margin - gap2),
+    (margin + gap2, H // 2),
+    (W - margin - gap2, H // 2),
+]:
+    draw_diamond(draw, cx, cy, 7, fill=GOLD)
+    draw_diamond(draw, cx, cy, 3, fill=MAROON)
 
 # ---------------------------------------------------------------------------
-# Background guitar (low opacity)
+# Background electric guitar (Stratocaster-inspired silhouette, more visible)
 # ---------------------------------------------------------------------------
-print("Drawing background guitar...")
+print("Drawing background electric guitar...")
 
-def guitar(cx, cy, scale, color, alpha):
+def electric_guitar(cx, cy, scale, color, alpha):
+    """
+    Stratocaster-style silhouette assembled from polygon + circles.
+    Body has the iconic offset double-cutaway shape; long neck rises up-left.
+    """
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
     a = (color[0], color[1], color[2], alpha)
-    lb_w, lb_h = int(420 * scale), int(480 * scale)
-    d.ellipse([cx - lb_w//2, cy - lb_h//2, cx + lb_w//2, cy + lb_h//2], outline=a, width=int(6 * scale))
-    ub_w, ub_h = int(320 * scale), int(360 * scale)
-    ub_cy = cy - int(450 * scale)
-    d.ellipse([cx - ub_w//2, ub_cy - ub_h//2, cx + ub_w//2, ub_cy + ub_h//2], outline=a, width=int(6 * scale))
-    sh_cx, sh_cy = cx, cy - int(40 * scale)
-    sh_r = int(70 * scale)
-    d.ellipse([sh_cx - sh_r, sh_cy - sh_r, sh_cx + sh_r, sh_cy + sh_r], outline=a, width=int(5 * scale))
-    d.ellipse([sh_cx - sh_r + 14, sh_cy - sh_r + 14, sh_cx + sh_r - 14, sh_cy + sh_r - 14], outline=a, width=int(2 * scale))
-    neck_w = int(48 * scale)
-    neck_h = int(620 * scale)
-    neck_top = ub_cy - int(180 * scale) - neck_h
-    d.rectangle([cx - neck_w//2, neck_top, cx + neck_w//2, ub_cy - int(180 * scale) + 20], outline=a, width=int(5 * scale))
-    hs_w, hs_h = int(110 * scale), int(140 * scale)
-    d.rectangle([cx - hs_w//2, neck_top - hs_h, cx + hs_w//2, neck_top + 6], outline=a, width=int(5 * scale))
-    for i in range(1, 12):
-        fy = neck_top + int((neck_h / 12) * i)
-        d.line([cx - neck_w//2, fy, cx + neck_w//2, fy], fill=(color[0], color[1], color[2], int(alpha * 0.6)), width=1)
+
+    s = scale  # shorthand
+
+    # ---- BODY: offset double-cutaway shape, anchored at (cx, cy) ----
+    # We build the body silhouette as a closed polygon traced clockwise from top-left horn.
+    body_pts = [
+        (cx - 230 * s, cy - 240 * s),   # top-left horn tip (treble side)
+        (cx - 100 * s, cy - 280 * s),   # upper bout shoulder
+        (cx + 80 * s,  cy - 290 * s),   # neck-side notch (top)
+        (cx + 90 * s,  cy - 220 * s),   # neck heel
+        (cx + 140 * s, cy - 200 * s),   # transition
+        (cx + 280 * s, cy - 140 * s),   # upper-right curve
+        (cx + 340 * s, cy - 30 * s),    # right side mid
+        (cx + 330 * s, cy + 130 * s),   # right curve
+        (cx + 240 * s, cy + 280 * s),   # lower-right bottom
+        (cx + 60 * s,  cy + 340 * s),   # base curve
+        (cx - 130 * s, cy + 320 * s),   # lower-left
+        (cx - 270 * s, cy + 220 * s),   # back of lower bout
+        (cx - 320 * s, cy + 80 * s),    # left side
+        (cx - 280 * s, cy - 80 * s),    # left horn lower
+        (cx - 290 * s, cy - 180 * s),   # left horn (bass side, longer)
+        (cx - 230 * s, cy - 240 * s),   # close shape
+    ]
+    # Subtle interior fill first (so outline sits on top crisply)
+    inner_a = (color[0], color[1], color[2], max(20, int(alpha * 0.55)))
+    d.polygon(body_pts, fill=inner_a)
+    # Outline the body
+    d.polygon(body_pts, outline=a, width=int(8 * s))
+
+    # ---- PICKGUARD (white pickguard typical of Strats, drawn as outline) ----
+    pg_pts = [
+        (cx - 80 * s,  cy - 200 * s),
+        (cx + 80 * s,  cy - 180 * s),
+        (cx + 130 * s, cy - 100 * s),
+        (cx + 160 * s, cy + 20 * s),
+        (cx + 130 * s, cy + 140 * s),
+        (cx + 60 * s,  cy + 220 * s),
+        (cx - 100 * s, cy + 240 * s),
+        (cx - 220 * s, cy + 130 * s),
+        (cx - 180 * s, cy - 30 * s),
+        (cx - 130 * s, cy - 150 * s),
+    ]
+    d.polygon(pg_pts, outline=a, width=int(4 * s))
+
+    # ---- 3 single-coil PICKUPS (rectangles inside the pickguard) ----
+    pu_positions = [(cx - 80 * s, cy - 80 * s), (cx - 30 * s, cy + 20 * s), (cx + 20 * s, cy + 120 * s)]
+    for px, py in pu_positions:
+        d.rectangle([px - 60 * s, py - 14 * s, px + 60 * s, py + 14 * s], outline=a, width=int(3 * s))
+        # Pole pieces
+        for i in range(6):
+            ppx = px - 50 * s + (i * 20 * s)
+            ppy = py
+            d.ellipse([ppx - 3 * s, ppy - 3 * s, ppx + 3 * s, ppy + 3 * s], fill=a)
+
+    # ---- CONTROL KNOBS (3 volume/tone) and selector switch ----
+    knob_positions = [(cx + 90 * s, cy + 80 * s), (cx + 110 * s, cy + 140 * s), (cx + 80 * s, cy + 200 * s)]
+    for kx, ky in knob_positions:
+        d.ellipse([kx - 14 * s, ky - 14 * s, kx + 14 * s, ky + 14 * s], outline=a, width=int(3 * s))
+        d.line([kx, ky - 10 * s, kx, ky - 4 * s], fill=a, width=int(3 * s))
+    # Pickup selector lever
+    d.line([cx - 30 * s, cy + 200 * s, cx - 50 * s, cy + 240 * s], fill=a, width=int(4 * s))
+
+    # ---- BRIDGE / TREMOLO assembly ----
+    br_x, br_y = cx + 60 * s, cy + 180 * s
+    d.rectangle([br_x - 50 * s, br_y - 12 * s, br_x + 50 * s, br_y + 12 * s], outline=a, width=int(3 * s))
+    # 6 saddle dots
     for i in range(6):
-        sx = cx - neck_w//2 + int(neck_w * (i + 1) / 7)
-        d.line([sx, neck_top, sx, cy + lb_h//2 - int(40 * scale)], fill=(color[0], color[1], color[2], int(alpha * 0.5)), width=1)
-    br_w, br_h = int(160 * scale), int(20 * scale)
-    br_cy = cy + int(110 * scale)
-    d.rectangle([cx - br_w//2, br_cy, cx + br_w//2, br_cy + br_h], outline=a, width=int(4 * scale))
+        sx = br_x - 40 * s + (i * 16 * s)
+        d.ellipse([sx - 3 * s, br_y - 4 * s, sx + 3 * s, br_y + 4 * s], fill=a)
+
+    # ---- OUTPUT JACK on the lower right edge ----
+    d.ellipse([cx + 270 * s, cy + 100 * s, cx + 300 * s, cy + 130 * s], outline=a, width=int(3 * s))
+
+    # ---- NECK rising from the neck-heel up to the headstock ----
+    # Neck angle: roughly toward upper-right (in the rotated layer this becomes the diagonal we want)
+    neck_base_x = cx + 100 * s
+    neck_base_y = cy - 250 * s
+    neck_len = 720 * s
+    neck_w = 50 * s
+    # Draw neck as a rotated rectangle going up-and-to-the-right
+    import math as _m
+    angle = -1.05  # radians ≈ -60°, points up-right
+    dx, dy = _m.cos(angle), _m.sin(angle)
+    perp_x, perp_y = -dy, dx
+    p1 = (neck_base_x + perp_x * neck_w / 2, neck_base_y + perp_y * neck_w / 2)
+    p2 = (neck_base_x - perp_x * neck_w / 2, neck_base_y - perp_y * neck_w / 2)
+    p3 = (neck_base_x + dx * neck_len - perp_x * neck_w / 2, neck_base_y + dy * neck_len - perp_y * neck_w / 2)
+    p4 = (neck_base_x + dx * neck_len + perp_x * neck_w / 2, neck_base_y + dy * neck_len + perp_y * neck_w / 2)
+    d.polygon([p1, p2, p3, p4], outline=a, width=int(5 * s))
+
+    # Frets across the neck
+    for i in range(1, 22):
+        t = i / 22
+        fcx = neck_base_x + dx * neck_len * t
+        fcy = neck_base_y + dy * neck_len * t
+        fp1 = (fcx + perp_x * neck_w / 2, fcy + perp_y * neck_w / 2)
+        fp2 = (fcx - perp_x * neck_w / 2, fcy - perp_y * neck_w / 2)
+        d.line([fp1, fp2], fill=(color[0], color[1], color[2], int(alpha * 0.7)), width=1)
+    # Fret-position dots (3rd, 5th, 7th, 9th, 12th double, 15th, 17th)
+    for i in [3, 5, 7, 9, 12, 12, 15, 17]:
+        t = i / 22
+        fcx = neck_base_x + dx * neck_len * t
+        fcy = neck_base_y + dy * neck_len * t
+        # Offset slightly from center for the double-dot on 12
+        offset = -10 * s if i == 12 and (12 in [3, 5, 7, 9]) else 0
+        d.ellipse([fcx - 5 * s, fcy - 5 * s, fcx + 5 * s, fcy + 5 * s], fill=a)
+
+    # ---- HEADSTOCK at end of neck ----
+    head_cx = neck_base_x + dx * neck_len
+    head_cy = neck_base_y + dy * neck_len
+    # Headstock shape — Stratocaster-style: leans to one side
+    head_pts = [
+        (head_cx + perp_x * neck_w / 2, head_cy + perp_y * neck_w / 2),
+        (head_cx + dx * 40 * s + perp_x * neck_w * 1.4, head_cy + dy * 40 * s + perp_y * neck_w * 1.4),
+        (head_cx + dx * 130 * s + perp_x * neck_w * 1.6, head_cy + dy * 130 * s + perp_y * neck_w * 1.6),
+        (head_cx + dx * 180 * s, head_cy + dy * 180 * s),
+        (head_cx + dx * 130 * s - perp_x * neck_w * 0.4, head_cy + dy * 130 * s - perp_y * neck_w * 0.4),
+        (head_cx - perp_x * neck_w / 2, head_cy - perp_y * neck_w / 2),
+    ]
+    d.polygon(head_pts, outline=a, width=int(5 * s))
+    # Tuning pegs (6 small circles along headstock edge)
+    for i in range(6):
+        peg_t = 0.1 + i * 0.13
+        pcx = head_cx + dx * (180 * s * peg_t) + perp_x * neck_w * 1.5
+        pcy = head_cy + dy * (180 * s * peg_t) + perp_y * neck_w * 1.5
+        d.ellipse([pcx - 8 * s, pcy - 8 * s, pcx + 8 * s, pcy + 8 * s], outline=a, width=int(2 * s))
+
+    # ---- 6 STRINGS running from bridge to headstock ----
+    string_a = (color[0], color[1], color[2], int(alpha * 0.55))
+    for i in range(6):
+        # Spread strings across the neck width
+        offset = -neck_w / 2 + 5 * s + (i * (neck_w - 10 * s) / 5)
+        str_start = (br_x + (i - 2.5) * 14 * s, br_y - 10 * s)
+        str_end = (
+            head_cx + dx * (40 * s + i * 30 * s) + perp_x * (neck_w * 0.35 + (i - 2.5) * 6 * s),
+            head_cy + dy * (40 * s + i * 30 * s) + perp_y * (neck_w * 0.35 + (i - 2.5) * 6 * s)
+        )
+        d.line([str_start, str_end], fill=string_a, width=1)
+
     return layer
 
-g = guitar(W // 2 + 220, H // 2 + 140, 1.05, MAROON, 22)
-g = g.rotate(-15, resample=Image.BICUBIC, expand=False, center=(W // 2 + 220, H // 2 + 140))
+# Place electric guitar — large, clearly visible, behind the headline area
+g = electric_guitar(W // 2 + 50, H // 2 + 280, 1.25, EMBER, 95)
+g = g.rotate(-22, resample=Image.BICUBIC, expand=False, center=(W // 2 + 50, H // 2 + 280))
 img.paste(g, (0, 0), g)
-
-g2 = guitar(W // 2 - 360, H // 2 - 700, 0.45, EMBER, 14)
-g2 = g2.rotate(20, resample=Image.BICUBIC, expand=False, center=(W // 2 - 360, H // 2 - 700))
-img.paste(g2, (0, 0), g2)
 
 # ---------------------------------------------------------------------------
 # Decorative music notes (drawn shapes)

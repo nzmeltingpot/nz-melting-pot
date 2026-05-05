@@ -211,6 +211,91 @@ export default function TalentShowcase() {
         </div>
       </section>
 
+      {/* Sponsor banner — clickable, links to JR Finance */}
+      <section style={{ padding: '60px 20px 20px', background: 'var(--color-cream, #FBF5ED)' }}>
+        <div className="container reveal" style={{ maxWidth: 900 }}>
+          <p style={{
+            textAlign: 'center',
+            fontSize: '0.78rem',
+            letterSpacing: '3px',
+            textTransform: 'uppercase',
+            color: '#7B1E2D',
+            margin: '0 0 16px 0',
+            fontWeight: 600
+          }}>
+            Proudly Supported By Our Sponsor
+          </p>
+          <a
+            href="https://www.jrfinance.co.nz"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit JR Finance website (opens in a new tab)"
+            style={{
+              display: 'block',
+              textDecoration: 'none',
+              color: 'inherit',
+              background: '#fff',
+              border: '1.5px solid #e2e8f0',
+              borderRadius: 14,
+              padding: '24px 28px',
+              boxShadow: '0 4px 16px rgba(30, 25, 21, 0.06)',
+              transition: 'transform 0.2s, box-shadow 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 24px rgba(30, 25, 21, 0.12)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 16px rgba(30, 25, 21, 0.06)';
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 28,
+              flexWrap: 'wrap',
+              justifyContent: 'space-between'
+            }}>
+              {/* JR Finance brand mark */}
+              <div style={{ flex: '0 0 auto', textAlign: 'center', minWidth: 120 }}>
+                <div style={{ fontFamily: 'Georgia, serif', fontSize: 36, fontWeight: 700, color: '#3b6db8', letterSpacing: 1, lineHeight: 1 }}>JR</div>
+                <div style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: '#3b6db8', letterSpacing: 3, marginTop: 4 }}>FINANCE</div>
+                <div style={{ fontSize: 10, color: '#6b86b3', letterSpacing: 1.5, marginTop: 6, textTransform: 'lowercase' }}>create wealth</div>
+              </div>
+
+              {/* Vertical divider — only shows on wider screens */}
+              <div style={{ width: 1, alignSelf: 'stretch', background: '#e2e8f0', flex: '0 0 1px' }} aria-hidden="true" />
+
+              {/* Advisor details */}
+              <div style={{ flex: '1 1 240px', minWidth: 240, color: '#374151', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#1f2937', letterSpacing: 0.4 }}>JOHNRAE TANNEN</div>
+                <div style={{ color: '#6b86b3', fontSize: '0.88rem', marginBottom: 8 }}>Financial Advisor</div>
+                <div>+64 27-283-1946 &nbsp;·&nbsp; johnrae@jrfinance.co.nz</div>
+                <div style={{ color: '#6b7280', fontSize: '0.85rem', marginTop: 2 }}>1A/268 Manukau Road, Epsom, Auckland 1023</div>
+              </div>
+
+              {/* CTA */}
+              <div style={{ flex: '0 0 auto' }}>
+                <span style={{
+                  display: 'inline-block',
+                  padding: '10px 20px',
+                  background: '#3b6db8',
+                  color: '#fff',
+                  borderRadius: 25,
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  letterSpacing: 0.3,
+                  whiteSpace: 'nowrap'
+                }}>
+                  Visit Website →
+                </span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+
       {/* Cross-Promo — links to Musical Ensemble */}
       <section className="tickets-section tickets-section--dark">
         <div className="divider divider--top">

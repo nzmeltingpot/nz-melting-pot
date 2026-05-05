@@ -1,5 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
 import { generateUnsubscribeLink, generateNewsletterEmail } from '../utils/emailTemplates';
+import { sendBulkEmail } from '../utils/brevoClient';
+
+/**
+ * Helper: parse a stored "from" string like
+ *   "NZ Melting Pot <noreply@nzmeltingpot.com>"
+ * into the { email, name } object Brevo expects.
+ */
+function parseFromAddress(value) {
+  const fallback = { email: 'noreply@nzmeltingpot.com', name: 'NZ Melting Pot' };
+  if (!value || typeof value !== 'string') return fallback;
+  const m = value.match(/^\s*"?([^"<]+?)"?\s*<\s*([^>]+)\s*>\s*$/);
+  if (m) return { name: m[1].trim(), email: m[2].trim() };
+  // No display name — just an email
+  if (value.includes('@')) return { email: value.trim() };
+  return fallback;
+}
 
 // Format date as dd/mm/yyyy
 const formatDate = (dateStr) => {
@@ -489,64 +505,52 @@ export default function Admin() {
       return;
     }
 
-    // Get email from setting if available
+    // Bulk newsletter sending — uses Brevo via /api/sendBulkEmail (one HTTP call,
+    // function loops server-side). One-off transactional emails (form replies,
+    // payment confirmations) still go through Resend via window.ezsite.apis.sendEmail.
+
+    // Resolve the From and Reply-To fields. We keep them identical to the
+    // Resend-side from/reply-to so brand identity stays consistent.
     const fromSetting = settings.find((s) => s.setting_key === 'email_from');
-    const fromAddress = fromSetting?.setting_value || 'Newsletter <noreply@nzmeltingpot.com>';
+    const fromAddress = fromSetting?.setting_value || 'NZ Melting Pot <noreply@nzmeltingpot.com>';
+    const fromObj = parseFromAddress(fromAddress);
+    const replyToObj = { email: 'info@nzmeltingpot.com', name: 'NZ Melting Pot' };
 
-    let successCount = 0;
-    let failCount = 0;
-    let lastError = null;
+    // Build the per-recipient payload (personalised HTML + text)
+    const brevoRecipients = recipients.map((member) => {
+      const unsubscribeLink = generateUnsubscribeLink(member.email);
+      const personalizedBody = emailBody
+        .replace(/\{name\}/gi, member.full_name || 'Member')
+        .replace(/\{email\}/gi, member.email);
+      const { html, text } = generateNewsletterEmail({
+        fullName: member.full_name || 'Member',
+        newsletterContent: personalizedBody.split('\n').map((p) => p.trim() ? `<p>${p}</p>` : '').join(''),
+        unsubscribeLink,
+        newsletterName: 'NZ Melting Pot',
+        siteName: 'NZ Melting Pot'
+      });
+      return { email: member.email, name: member.full_name || undefined, html, text };
+    });
 
-    console.log(`Attempting to send email to ${recipients.length} recipients from: ${fromAddress}`);
+    console.log(`📨 [Brevo] Bulk newsletter to ${brevoRecipients.length} recipients from: ${fromAddress}`);
 
-    for (const member of recipients) {
-      try {
-        const unsubscribeLink = generateUnsubscribeLink(member.email);
-        const personalizedBody = emailBody.
-        replace(/\{name\}/gi, member.full_name || 'Member').
-        replace(/\{email\}/gi, member.email);
+    const result = await sendBulkEmail({
+      from: fromObj,
+      replyTo: replyToObj,
+      subject: emailSubject,
+      recipients: brevoRecipients
+    });
 
-        // Use the professional email template
-        const { html, text } = generateNewsletterEmail({
-          fullName: member.full_name || 'Member',
-          newsletterContent: personalizedBody.split('\n').map((p) => p.trim() ? `<p>${p}</p>` : '').join(''),
-          unsubscribeLink,
-          newsletterName: 'NZ Melting Pot',
-          siteName: 'NZ Melting Pot'
-        });
+    console.log('📨 [Brevo] Result:', result);
 
-        console.log(`Sending to: ${member.email}`);
-        const result = await window.ezsite.apis.sendEmail({
-          from: fromAddress,
-          to: [member.email],
-          subject: emailSubject,
-          html,
-          text
-        });
-        console.log(`sendEmail result for ${member.email}:`, result);
-        const { error } = result || {};
-
-        if (error) {
-          console.error('Email send error for', member.email, ':', error);
-          failCount++;
-          if (!lastError) {
-            // Handle error as object or string
-            lastError = typeof error === 'string' ? error : error.message || error.Message || JSON.stringify(error);
-          }
-        } else {
-          successCount++;
-        }
-      } catch (err) {
-        console.error('Email send exception for', member.email, ':', err);
-        failCount++;
-        if (!lastError) lastError = err.message || 'Unknown error';
-      }
-    }
+    const successCount = result.sent;
+    const failCount = result.failed;
+    const lastError = result.error || result.failures?.[0]?.error || null;
 
     setSendingEmail(false);
 
     if (successCount > 0 && failCount === 0) {
-      setEmailResult({ success: true, message: `Email sent to ${successCount} member${successCount !== 1 ? 's' : ''}` });
+      setEmailResult({ success: true, message: `Email sent to ${successCount} member${successCount !== 1 ? 's' : ''} via Brevo` });
       setTimeout(() => {
         setShowEmailModal(false);
         setEmailSubject('');
@@ -555,7 +559,7 @@ export default function Admin() {
         setEmailResult(null);
       }, 2000);
     } else if (successCount > 0) {
-      setEmailResult({ success: true, message: `Sent to ${successCount}, failed for ${failCount}` });
+      setEmailResult({ success: true, message: `Sent to ${successCount}, failed for ${failCount}${lastError ? ` — ${lastError}` : ''}` });
     } else {
       const errorMsg = lastError ? `Error: ${lastError}` : 'Failed to send emails. Please try again.';
       setEmailResult({ success: false, message: errorMsg });

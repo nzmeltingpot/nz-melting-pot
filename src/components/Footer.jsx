@@ -26,23 +26,32 @@ export default function Footer() {
         <div style={{
           textAlign: 'center',
           padding: '14px 16px 4px',
-          fontSize: '0.85rem',
-          color: '#ffffff',
-          letterSpacing: '0.5px'
+          color: '#ffffff'
         }}>
-          Website by{' '}
-          <a
-            href="https://websmarthq.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              color: '#ffffff',
-              fontWeight: 600,
-              textDecoration: 'underline',
-              textUnderlineOffset: '3px'
-            }}>
-            Web Smart HQ
-          </a>
+          <span style={{ fontSize: '0.9rem', letterSpacing: '0.5px' }}>
+            Website by{' '}
+            <a
+              href="https://websmarthq.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: '#ffffff',
+                fontWeight: 600,
+                textDecoration: 'underline',
+                textUnderlineOffset: '3px'
+              }}>
+              Web Smart HQ
+            </a>
+          </span>
+          <span style={{
+            display: 'inline-block',
+            marginLeft: 10,
+            fontSize: '0.78rem',
+            opacity: 0.8,
+            fontStyle: 'italic'
+          }}>
+            — Smart sites &amp; smart SEO that get your business found.
+          </span>
         </div>
 
         {/* Large typographic lockup */}

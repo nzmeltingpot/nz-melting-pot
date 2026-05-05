@@ -1,24 +1,27 @@
 /**
  * Brevo bulk-email helper.
  *
- * Calls our Vercel `/api/sendBulkEmail` endpoint, which uses the Brevo
- * transactional API under the hood. Reserve this for newsletter blasts
- * and other bulk sends. For one-off transactional emails (form submissions,
- * payment confirmations, contact form replies) keep using
- * window.ezsite.apis.sendEmail (Resend).
+ * Calls Ezsite's Deno backend function `email/sendBulkEmail`, which uses
+ * the Brevo transactional API under the hood. Reserve this for newsletter
+ * blasts and other bulk sends.
  *
- * Required env at build:
- *   VITE_STRIPE_BACKEND_URL  — same Vercel deployment used for Stripe
- *                              (the bulk email function is hosted alongside it).
+ * For one-off transactional emails (form submissions, payment confirmations,
+ * contact form replies) keep using window.ezsite.apis.sendEmail (Resend).
+ *
+ * Backend signature (Ezsite Deno function):
+ *   path:       'email/sendBulkEmail'
+ *   methodName: 'sendBulkEmail'
+ *   param:      [{ from, replyTo, subject, recipients }]
+ *
+ *   Reads BREVO_API_KEY from Deno.env, calls Brevo per-recipient,
+ *   returns { sent, failed, failures, durationMs }.
  */
-
-const BACKEND_URL = import.meta.env.VITE_STRIPE_BACKEND_URL || '';
 
 /**
  * Send the same email (with per-recipient personalisation) to many people via Brevo.
  *
  * @param {Object} params
- * @param {Object} params.from         — { email, name? }
+ * @param {Object} params.from         — { email, name? }   (must be verified in Brevo)
  * @param {Object} [params.replyTo]    — { email, name? }
  * @param {string} params.subject      — default subject (per-recipient subject overrides)
  * @param {Array<{email:string,name?:string,html:string,text?:string,subject?:string}>} params.recipients
@@ -30,34 +33,40 @@ export async function sendBulkEmail(params) {
     return { sent: 0, failed: 0, failures: [], error: 'No recipients provided.' };
   }
 
-  const endpoint = `${BACKEND_URL}/api/sendBulkEmail`;
+  if (!window?.ezsite?.apis?.run) {
+    return {
+      sent: 0,
+      failed: params.recipients.length,
+      failures: params.recipients.map((r) => ({ email: r.email, error: 'Ezsite API not available' })),
+      error: 'window.ezsite.apis.run is not available — backend integration missing.'
+    };
+  }
 
   try {
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params)
+    const { data, error } = await window.ezsite.apis.run({
+      path: 'email/sendBulkEmail',
+      methodName: 'sendBulkEmail',
+      param: [params]
     });
 
-    const json = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
+    if (error) {
       return {
         sent: 0,
         failed: params.recipients.length,
         failures: params.recipients.map((r) => ({
           email: r.email,
-          error: json?.error || `HTTP ${res.status}`
+          error: typeof error === 'string' ? error : (error.message || JSON.stringify(error))
         })),
-        error: json?.error || `Backend returned ${res.status}`
+        error: typeof error === 'string' ? error : (error.message || JSON.stringify(error))
       };
     }
 
+    // Backend returns the aggregate result directly in `data`
     return {
-      sent: json.sent || 0,
-      failed: json.failed || 0,
-      failures: json.failures || [],
-      durationMs: json.durationMs
+      sent: data?.sent || 0,
+      failed: data?.failed || 0,
+      failures: data?.failures || [],
+      durationMs: data?.durationMs
     };
   } catch (err) {
     return {
@@ -67,7 +76,7 @@ export async function sendBulkEmail(params) {
         email: r.email,
         error: err?.message || 'network error'
       })),
-      error: err?.message || 'Network error contacting bulk-email backend.'
+      error: err?.message || 'Network error contacting Ezsite bulk-email backend.'
     };
   }
 }

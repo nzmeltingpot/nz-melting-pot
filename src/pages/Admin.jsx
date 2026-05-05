@@ -1545,9 +1545,9 @@ export default function Admin() {
                 fontSize: '0.8rem',
                 color: '#0369a1'
               }}>
-                    <strong style={{ display: 'block', marginBottom: 4 }}>📧 Email Service (Resend)</strong>
-                    Emails are sent via Resend. Configure your API key in Project Settings.
-                    Free tier: 100 emails/day — ideal for ~300 members.
+                    <strong style={{ display: 'block', marginBottom: 4 }}>📨 Email Service (Brevo — bulk newsletters)</strong>
+                    Newsletters are sent via Brevo. Configure <code>BREVO_API_KEY</code> in your Ezsite Env Vars panel.
+                    Free tier: 300 emails/day. Single transactional emails (form submissions, payment confirmations) still use Resend.
                   </div>
 
                   <p style={{ color: '#666', fontSize: '0.85rem', marginBottom: 16 }}>

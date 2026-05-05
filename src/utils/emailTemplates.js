@@ -3,26 +3,78 @@
  * Reusable HTML email templates for newsletters and communications
  */
 
+const SITE_URL = 'https://www.nzmeltingpot.com';
+const LOGO_URL = `${SITE_URL}/images/branding/logo-300x300.png`;
+
+/* Brand palette — used consistently across all NZMP emails */
+const COLOR_MAROON = '#7B1E2D';
+const COLOR_EMBER = '#A83832';
+const COLOR_GOLD = '#c9a227';
+const COLOR_CREAM = '#FBF5ED';
+const COLOR_DARK = '#1E1915';
+const COLOR_BODY = '#2d3748';
+const COLOR_MUTED = '#6b7280';
+
 /**
- * Generate Newsletter Email HTML
+ * Reusable JR Finance sponsor footer block.
+ * Recreated in HTML rather than as an image so it scales on every email
+ * client without broken-image risk.
+ */
+function buildSponsorBlock() {
+  return `
+    <!-- Sponsor section -->
+    <tr>
+      <td style="padding: 24px 40px 12px;">
+        <p style="margin: 0; text-align: center; font-size: 11px; color: ${COLOR_MUTED}; letter-spacing: 2.5px; text-transform: uppercase; font-family: Arial, Helvetica, sans-serif;">
+          Proudly Supported By
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 40px 28px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; font-family: Arial, Helvetica, sans-serif;">
+          <tr>
+            <!-- JR Finance brand -->
+            <td style="padding:18px 22px; vertical-align:middle; width:160px; border-right:2px solid #e2e8f0; text-align:center;">
+              <div style="font-family:'Georgia', serif; font-size:30px; font-weight:bold; color:#3b6db8; letter-spacing:1px; line-height:1;">JR</div>
+              <div style="font-family:'Georgia', serif; font-size:14px; color:#3b6db8; letter-spacing:3px; margin-top:4px;">FINANCE</div>
+              <div style="font-size:9px; color:#6b86b3; letter-spacing:1.5px; margin-top:8px; text-transform:lowercase;">create wealth</div>
+            </td>
+            <!-- Contact details -->
+            <td style="padding:18px 22px; vertical-align:middle; font-size:13px; color:#374151; line-height:1.6;">
+              <div style="font-weight:bold; font-size:15px; color:#1f2937; letter-spacing:0.5px;">JOHNRAE TANNEN</div>
+              <div style="color:#6b86b3; margin-bottom:10px;">Financial Advisor</div>
+              <div>📞 <a href="tel:+64272831946" style="color:#374151; text-decoration:none;">+64 27-283-1946</a></div>
+              <div>✉️ <a href="mailto:johnrae@jrfinance.co.nz" style="color:#374151; text-decoration:none;">johnrae@jrfinance.co.nz</a></div>
+              <div>🌐 <a href="https://www.jrfinance.co.nz" style="color:#374151; text-decoration:none;">www.jrfinance.co.nz</a></div>
+              <div style="margin-top:4px; color:#6b7280; font-size:12px;">📍 1A/268 Manukau Road, Epsom, Auckland 1023</div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>`;
+}
+
+/**
+ * Generate Newsletter Email HTML — branded for NZ Melting Pot.
  * @param {Object} params - Template parameters
  * @param {string} params.fullName - Recipient's full name
  * @param {string} params.newsletterContent - Main newsletter content (HTML supported)
  * @param {string} params.unsubscribeLink - Unsubscribe URL
- * @param {string} [params.newsletterName] - Newsletter name (default: 'Musical Talent Showcase')
- * @param {string} [params.siteName] - Site name (default: 'Musical Talent Showcase')
- * @param {string} [params.accentColor] - Primary accent color (default: '#c9a227')
+ * @param {string} [params.newsletterName] - Newsletter name (default: 'NZ Melting Pot Newsletter')
+ * @param {string} [params.siteName] - Site name (default: 'NZ Melting Pot')
+ * @param {string} [params.accentColor] - Primary accent color (default: brand maroon)
  * @returns {Object} { subject, html, text }
  */
 export function generateNewsletterEmail({
   fullName,
   newsletterContent,
   unsubscribeLink,
-  newsletterName = 'Musical Talent Showcase',
-  siteName = 'Musical Talent Showcase',
-  accentColor = '#c9a227'
+  newsletterName = 'NZ Melting Pot Newsletter',
+  siteName = 'NZ Melting Pot',
+  accentColor = COLOR_MAROON
 }) {
-  const subject = `${newsletterName} — Latest Update`;
+  const subject = `${siteName} — Latest Update`;
 
   const html = `
 <!DOCTYPE html>
@@ -32,25 +84,47 @@ export function generateNewsletterEmail({
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${subject}</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: 'Georgia', 'Times New Roman', serif;">
+<body style="margin: 0; padding: 0; background-color: ${COLOR_CREAM}; font-family: Arial, Helvetica, sans-serif;">
   <table role="presentation" style="width: 100%; border-collapse: collapse;">
     <tr>
-      <td align="center" style="padding: 40px 20px;">
-        <table role="presentation" style="width: 100%; max-width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+      <td align="center" style="padding: 40px 16px;">
+        <table role="presentation" style="width: 100%; max-width: 640px; border-collapse: collapse; background-color: #ffffff; border-radius: 14px; box-shadow: 0 6px 24px rgba(30, 25, 21, 0.10); overflow: hidden;">
 
-          <!-- Header -->
+          <!-- Branded header with logo -->
           <tr>
-            <td style="padding: 40px 40px 30px; text-align: center; border-bottom: 3px solid ${accentColor};">
-              <h1 style="margin: 0; font-size: 28px; font-weight: normal; color: #1a1a1a; letter-spacing: 1px;">
+            <td style="padding: 0; background: linear-gradient(135deg, ${COLOR_MAROON} 0%, ${COLOR_EMBER} 100%);">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+                <tr>
+                  <td align="center" style="padding: 30px 30px 26px;">
+                    <img src="${LOGO_URL}" alt="NZ Melting Pot" width="80" height="80" style="display:block; border-radius:50%; border:3px solid ${COLOR_GOLD}; background:#fff;" />
+                    <h1 style="margin: 14px 0 4px; font-family: 'Georgia', serif; font-size: 28px; font-weight: bold; color: #ffffff; letter-spacing: 0.5px;">
+                      ${siteName}
+                    </h1>
+                    <p style="margin: 0; font-size: 11px; color: ${COLOR_GOLD}; letter-spacing: 3px; text-transform: uppercase;">
+                      Auckland · New Zealand
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Gold accent bar -->
+          <tr><td style="height: 4px; background: ${COLOR_GOLD}; line-height: 4px;">&nbsp;</td></tr>
+
+          <!-- Newsletter title -->
+          <tr>
+            <td style="padding: 30px 40px 4px;">
+              <p style="margin: 0; font-size: 11px; color: ${COLOR_GOLD}; letter-spacing: 2.5px; text-transform: uppercase; font-weight: bold;">
                 ${newsletterName}
-              </h1>
+              </p>
             </td>
           </tr>
 
           <!-- Greeting -->
           <tr>
-            <td style="padding: 35px 40px 10px;">
-              <p style="margin: 0; font-size: 18px; color: #333; line-height: 1.6;">
+            <td style="padding: 14px 40px 10px;">
+              <p style="margin: 0; font-size: 17px; color: ${COLOR_DARK}; line-height: 1.6; font-family: 'Georgia', serif;">
                 Dear ${fullName},
               </p>
             </td>
@@ -58,8 +132,8 @@ export function generateNewsletterEmail({
 
           <!-- Newsletter Content -->
           <tr>
-            <td style="padding: 20px 40px 35px;">
-              <div style="font-size: 16px; color: #444; line-height: 1.8;">
+            <td style="padding: 6px 40px 30px;">
+              <div style="font-size: 15px; color: ${COLOR_BODY}; line-height: 1.75;">
                 ${newsletterContent}
               </div>
             </td>
@@ -68,36 +142,44 @@ export function generateNewsletterEmail({
           <!-- Divider -->
           <tr>
             <td style="padding: 0 40px;">
-              <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 0;" />
+              <div style="border-top: 1px dashed #d4c4a8; height: 1px; line-height: 1px;">&nbsp;</div>
             </td>
           </tr>
 
-          <!-- Footer Message -->
+          <!-- Friendly footer message -->
           <tr>
-            <td style="padding: 30px 40px 20px;">
-              <p style="margin: 0; font-size: 14px; color: #666; line-height: 1.7; font-style: italic;">
-                You're receiving this because you chose to be part of our little community at <strong style="color: #444;">${siteName}</strong> — and we've truly loved having you here.
+            <td style="padding: 24px 40px 14px;">
+              <p style="margin: 0; font-size: 13px; color: ${COLOR_MUTED}; line-height: 1.7; font-style: italic;">
+                You're receiving this because you're part of our community at <strong style="color: ${COLOR_MAROON}; font-style: normal;">${siteName}</strong> — and we love having you here.
               </p>
             </td>
           </tr>
 
           <!-- Unsubscribe -->
           <tr>
-            <td style="padding: 10px 40px 35px;">
-              <p style="margin: 0; font-size: 14px; color: #666; line-height: 1.7;">
-                If you feel it's time to part ways, we completely understand. You can
-                <a href="${unsubscribeLink}" style="color: ${accentColor}; text-decoration: underline;">unsubscribe here</a>.
-              </p>
-              <p style="margin: 15px 0 0; font-size: 14px; color: #888; line-height: 1.7;">
-                We'll take care of it quietly and with no hard feelings — though you'll always be welcome back. 🙂
+            <td style="padding: 4px 40px 26px;">
+              <p style="margin: 0; font-size: 12px; color: ${COLOR_MUTED}; line-height: 1.7;">
+                If you'd prefer not to hear from us, you can
+                <a href="${unsubscribeLink}" style="color: ${COLOR_MAROON}; text-decoration: underline;">unsubscribe here</a>
+                — no hard feelings, you're always welcome back.
               </p>
             </td>
           </tr>
 
-          <!-- Bottom Bar -->
+          ${buildSponsorBlock()}
+
+          <!-- Bottom bar -->
           <tr>
-            <td style="padding: 20px 40px; background-color: #fafafa; border-radius: 0 0 8px 8px; text-align: center;">
-              <p style="margin: 0; font-size: 12px; color: #999;">
+            <td style="padding: 18px 40px; background-color: ${COLOR_DARK}; text-align: center;">
+              <p style="margin: 0 0 4px; font-size: 12px; color: ${COLOR_GOLD}; font-family: 'Georgia', serif; letter-spacing: 1px;">
+                ${siteName}
+              </p>
+              <p style="margin: 0 0 6px; font-size: 11px; color: #9ca3af;">
+                <a href="${SITE_URL}" style="color: #9ca3af; text-decoration: none;">www.nzmeltingpot.com</a>
+                ·
+                <a href="${SITE_URL}/contact" style="color: #9ca3af; text-decoration: none;">Contact</a>
+              </p>
+              <p style="margin: 0; font-size: 10px; color: #6b7280;">
                 © ${new Date().getFullYear()} ${siteName}. All rights reserved.
               </p>
             </td>
@@ -113,7 +195,7 @@ export function generateNewsletterEmail({
 
   // Plain text version for email clients that don't support HTML
   const text = `
-${newsletterName} — Latest Update
+${siteName.toUpperCase()} — ${newsletterName}
 
 Dear ${fullName},
 
@@ -121,12 +203,20 @@ ${stripHtml(newsletterContent)}
 
 ---
 
-You're receiving this because you chose to be part of our little community at ${siteName} — and we've truly loved having you here.
+You're receiving this because you're part of our community at ${siteName} — and we love having you here.
 
-If you feel it's time to part ways, we completely understand. You can unsubscribe here: ${unsubscribeLink}
+If you'd prefer not to hear from us, you can unsubscribe here: ${unsubscribeLink}
 
-We'll take care of it quietly and with no hard feelings — though you'll always be welcome back. :)
+— Proudly supported by —
+JR FINANCE  ·  create wealth
+JOHNRAE TANNEN, Financial Advisor
++64 27-283-1946  ·  johnrae@jrfinance.co.nz
+www.jrfinance.co.nz
+1A/268 Manukau Road, Epsom, Auckland 1023, New Zealand
 
+---
+
+${siteName}  ·  www.nzmeltingpot.com
 © ${new Date().getFullYear()} ${siteName}. All rights reserved.
   `.trim();
 

@@ -96,122 +96,270 @@ def bullet_warning(d, cx, cy, color):
 
 
 # ---------------------------------------------------------------------------
-# Electric (Stratocaster-style) guitar silhouette
+# Electric (Stratocaster) guitar silhouette — drawn as smooth Bezier curves
 # ---------------------------------------------------------------------------
+def cubic_bezier(p0, p1, p2, p3, n=24):
+    """Sample a cubic Bezier curve at n+1 evenly-spaced points."""
+    pts = []
+    for i in range(n + 1):
+        t = i / n
+        u = 1 - t
+        x = u**3 * p0[0] + 3 * u**2 * t * p1[0] + 3 * u * t**2 * p2[0] + t**3 * p3[0]
+        y = u**3 * p0[1] + 3 * u**2 * t * p1[1] + 3 * u * t**2 * p2[1] + t**3 * p3[1]
+        pts.append((x, y))
+    return pts
+
+
 def electric_guitar(W, H, cx, cy, scale, color, alpha):
+    """
+    Stratocaster silhouette via chained cubic Bezier segments.
+    Local coordinates are then scaled by `scale` and offset by (cx, cy).
+    Body is drawn from audience perspective with neck rising UP-LEFT.
+    """
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
     a = (color[0], color[1], color[2], alpha)
+    inner_a = (color[0], color[1], color[2], max(20, int(alpha * 0.55)))
     s = scale
 
-    body_pts = [
-        (cx - 230 * s, cy - 240 * s),
-        (cx - 100 * s, cy - 280 * s),
-        (cx + 80 * s,  cy - 290 * s),
-        (cx + 90 * s,  cy - 220 * s),
-        (cx + 140 * s, cy - 200 * s),
-        (cx + 280 * s, cy - 140 * s),
-        (cx + 340 * s, cy - 30 * s),
-        (cx + 330 * s, cy + 130 * s),
-        (cx + 240 * s, cy + 280 * s),
-        (cx + 60 * s,  cy + 340 * s),
-        (cx - 130 * s, cy + 320 * s),
-        (cx - 270 * s, cy + 220 * s),
-        (cx - 320 * s, cy + 80 * s),
-        (cx - 280 * s, cy - 80 * s),
-        (cx - 290 * s, cy - 180 * s),
-        (cx - 230 * s, cy - 240 * s),
-    ]
-    inner_a = (color[0], color[1], color[2], max(20, int(alpha * 0.55)))
-    d.polygon(body_pts, fill=inner_a)
-    d.polygon(body_pts, outline=a, width=int(8 * s))
+    def P(x, y):
+        """Place a body-local point onto the canvas."""
+        return (cx + x * s, cy + y * s)
 
-    pg_pts = [
-        (cx - 80 * s,  cy - 200 * s),
-        (cx + 80 * s,  cy - 180 * s),
-        (cx + 130 * s, cy - 100 * s),
-        (cx + 160 * s, cy + 20 * s),
-        (cx + 130 * s, cy + 140 * s),
-        (cx + 60 * s,  cy + 220 * s),
-        (cx - 100 * s, cy + 240 * s),
-        (cx - 220 * s, cy + 130 * s),
-        (cx - 180 * s, cy - 30 * s),
-        (cx - 130 * s, cy - 150 * s),
-    ]
-    d.polygon(pg_pts, outline=a, width=int(4 * s))
+    # ----- BODY OUTLINE (smooth Strat silhouette) -----
+    # Going CLOCKWISE starting at the bass-side horn tip (upper right of body),
+    # using cubic Bezier segments for every curve.
+    body = []
+    body += cubic_bezier(
+        P(220, -295),    # Bass horn tip (top-right)
+        P(290, -250),    # control: outer roll-down
+        P(330, -160),    # control: shoulder slope
+        P(330, -50),     # waist transition (right shoulder)
+    )
+    body += cubic_bezier(
+        P(330, -50),
+        P(345, 60),
+        P(330, 175),
+        P(290, 270),     # right side of lower bout
+    )
+    body += cubic_bezier(
+        P(290, 270),
+        P(220, 360),
+        P(80, 395),
+        P(-60, 380),     # bottom of the lower bout (rounded)
+    )
+    body += cubic_bezier(
+        P(-60, 380),
+        P(-200, 365),
+        P(-310, 280),
+        P(-340, 160),    # left side of lower bout
+    )
+    body += cubic_bezier(
+        P(-340, 160),
+        P(-355, 60),
+        P(-340, -40),
+        P(-300, -100),   # waist on the left (treble side)
+    )
+    # Treble horn (smaller than bass, tucked under the neck)
+    body += cubic_bezier(
+        P(-300, -100),
+        P(-260, -180),
+        P(-200, -240),
+        P(-130, -250),   # treble horn tip
+    )
+    # Cutaway curve back toward neck heel
+    body += cubic_bezier(
+        P(-130, -250),
+        P(-90, -210),
+        P(-50, -180),
+        P(-30, -150),    # treble cutaway, deepest point near neck heel
+    )
+    # Across the neck-pocket area to the bass horn cutaway
+    body += cubic_bezier(
+        P(-30, -150),
+        P(20, -160),
+        P(60, -190),
+        P(90, -220),     # transition over neck pocket
+    )
+    # Up to bass horn tip (closing the silhouette)
+    body += cubic_bezier(
+        P(90, -220),
+        P(140, -270),
+        P(180, -290),
+        P(220, -295),
+    )
 
-    pu_positions = [(cx - 80 * s, cy - 80 * s), (cx - 30 * s, cy + 20 * s), (cx + 20 * s, cy + 120 * s)]
-    for px, py in pu_positions:
-        d.rectangle([px - 60 * s, py - 14 * s, px + 60 * s, py + 14 * s], outline=a, width=int(3 * s))
+    # Body — fill + outline
+    d.polygon(body, fill=inner_a)
+    # Use line connections for outline so we can control width
+    for i in range(len(body)):
+        p_a = body[i]
+        p_b = body[(i + 1) % len(body)]
+        d.line([p_a, p_b], fill=a, width=max(2, int(7 * s)))
+
+    # ----- PICKGUARD (offset 11-screw Strat shape, smaller than body) -----
+    pg = []
+    pg += cubic_bezier(P(0, -200),   P(60, -200),   P(110, -150),  P(130, -90),  n=16)
+    pg += cubic_bezier(P(130, -90),  P(150, -10),   P(140, 80),    P(110, 160), n=16)
+    pg += cubic_bezier(P(110, 160),  P(80, 220),    P(20, 240),    P(-60, 240), n=16)
+    pg += cubic_bezier(P(-60, 240),  P(-160, 230),  P(-220, 160),  P(-230, 80), n=16)
+    pg += cubic_bezier(P(-230, 80),  P(-235, 0),    P(-215, -80),  P(-180, -130), n=16)
+    pg += cubic_bezier(P(-180, -130), P(-130, -180), P(-60, -200),  P(0, -200), n=16)
+    for i in range(len(pg)):
+        d.line([pg[i], pg[(i + 1) % len(pg)]], fill=a, width=max(1, int(3 * s)))
+
+    # ----- 3 SINGLE-COIL PICKUPS (slanted bridge-pickup like a real Strat) -----
+    # Neck pickup
+    def pickup(center, angle_deg, length=130, height=22):
+        """Draw a slim rectangle at angle, with 6 polepiece dots."""
+        ang = math.radians(angle_deg)
+        cos_a, sin_a = math.cos(ang), math.sin(ang)
+        cxp, cyp = center
+        # 4 corners of the rotated rect
+        dx_ = length * s / 2
+        dy_ = height * s / 2
+        corners = []
+        for ox, oy in [(-dx_, -dy_), (dx_, -dy_), (dx_, dy_), (-dx_, dy_)]:
+            rx = ox * cos_a - oy * sin_a
+            ry = ox * sin_a + oy * cos_a
+            corners.append((cxp + rx, cyp + ry))
+        for i in range(4):
+            d.line([corners[i], corners[(i + 1) % 4]], fill=a, width=max(1, int(2 * s)))
+        # 6 polepieces evenly spaced along the long axis
         for i in range(6):
-            ppx = px - 50 * s + (i * 20 * s)
-            d.ellipse([ppx - 3 * s, py - 3 * s, ppx + 3 * s, py + 3 * s], fill=a)
+            t = -dx_ + (dx_ * 2) * (i + 0.5) / 6
+            px = cxp + t * cos_a
+            py = cyp + t * sin_a
+            d.ellipse([px - 3 * s, py - 3 * s, px + 3 * s, py + 3 * s], fill=a)
 
-    knob_positions = [(cx + 90 * s, cy + 80 * s), (cx + 110 * s, cy + 140 * s), (cx + 80 * s, cy + 200 * s)]
-    for kx, ky in knob_positions:
-        d.ellipse([kx - 14 * s, ky - 14 * s, kx + 14 * s, ky + 14 * s], outline=a, width=int(3 * s))
-        d.line([kx, ky - 10 * s, kx, ky - 4 * s], fill=a, width=int(3 * s))
-    d.line([cx - 30 * s, cy + 200 * s, cx - 50 * s, cy + 240 * s], fill=a, width=int(4 * s))
+    pickup(P(-100, -50), 0)            # neck pickup (horizontal-ish)
+    pickup(P(-40, 60), 0)              # middle pickup
+    pickup(P(30, 160), -10)            # bridge pickup (slightly slanted)
 
-    br_x, br_y = cx + 60 * s, cy + 180 * s
-    d.rectangle([br_x - 50 * s, br_y - 12 * s, br_x + 50 * s, br_y + 12 * s], outline=a, width=int(3 * s))
+    # ----- TREMOLO BRIDGE -----
+    br_cx, br_cy = P(80, 200)
+    br_w, br_h = 120 * s, 24 * s
+    d.rectangle([br_cx - br_w / 2, br_cy - br_h / 2, br_cx + br_w / 2, br_cy + br_h / 2], outline=a, width=max(1, int(2 * s)))
+    # 6 saddle dots
     for i in range(6):
-        sx = br_x - 40 * s + (i * 16 * s)
-        d.ellipse([sx - 3 * s, br_y - 4 * s, sx + 3 * s, br_y + 4 * s], fill=a)
+        sx = br_cx - br_w / 2 + 10 * s + (i * (br_w - 20 * s) / 5)
+        d.ellipse([sx - 3 * s, br_cy - 4 * s, sx + 3 * s, br_cy + 4 * s], fill=a)
+    # Tremolo arm — curved tail
+    arm = cubic_bezier(
+        (br_cx + br_w / 2 - 8 * s, br_cy + 6 * s),
+        (br_cx + br_w / 2 + 30 * s, br_cy + 30 * s),
+        (br_cx + br_w / 2 + 60 * s, br_cy + 90 * s),
+        (br_cx + br_w / 2 + 70 * s, br_cy + 140 * s),
+    )
+    for i in range(len(arm) - 1):
+        d.line([arm[i], arm[i + 1]], fill=a, width=max(1, int(3 * s)))
+    # Arm tip (white knob)
+    d.ellipse([arm[-1][0] - 7 * s, arm[-1][1] - 7 * s, arm[-1][0] + 7 * s, arm[-1][1] + 7 * s], fill=a)
 
-    d.ellipse([cx + 270 * s, cy + 100 * s, cx + 300 * s, cy + 130 * s], outline=a, width=int(3 * s))
+    # ----- 3 KNOBS (volume + 2 tone) + 5-WAY SELECTOR -----
+    for kx, ky in [P(180, 100), P(200, 165), P(180, 230)]:
+        d.ellipse([kx - 14 * s, ky - 14 * s, kx + 14 * s, ky + 14 * s], outline=a, width=max(1, int(2 * s)))
+        d.ellipse([kx - 4 * s, ky - 4 * s, kx + 4 * s, ky + 4 * s], fill=a)
+    # Selector switch (lever)
+    sel = P(120, 250)
+    d.line([sel, (sel[0] - 14 * s, sel[1] + 24 * s)], fill=a, width=max(1, int(3 * s)))
+    d.ellipse([sel[0] - 14 * s - 4 * s, sel[1] + 24 * s - 4 * s, sel[0] - 14 * s + 4 * s, sel[1] + 24 * s + 4 * s], fill=a)
 
-    neck_base_x = cx + 100 * s
-    neck_base_y = cy - 250 * s
-    neck_len = 720 * s
-    neck_w = 50 * s
-    angle = -1.05
+    # ----- OUTPUT JACK on lower-right edge -----
+    jx, jy = P(290, 110)
+    d.ellipse([jx - 14 * s, jy - 14 * s, jx + 14 * s, jy + 14 * s], outline=a, width=max(1, int(2 * s)))
+    d.ellipse([jx - 5 * s, jy - 5 * s, jx + 5 * s, jy + 5 * s], fill=a)
+
+    # ----- NECK + FRETS + HEADSTOCK -----
+    # Neck rises UP-LEFT from the treble cutaway pocket at roughly P(-130, -250)
+    neck_base = P(-130, -250)
+    # Strat neck is ~25.5" scale. We'll go approx 720 units long at -120° angle.
+    angle = math.radians(-120)  # up-and-to-the-left
     dx, dy = math.cos(angle), math.sin(angle)
     perp_x, perp_y = -dy, dx
-    p1 = (neck_base_x + perp_x * neck_w / 2, neck_base_y + perp_y * neck_w / 2)
-    p2 = (neck_base_x - perp_x * neck_w / 2, neck_base_y - perp_y * neck_w / 2)
-    p3 = (neck_base_x + dx * neck_len - perp_x * neck_w / 2, neck_base_y + dy * neck_len - perp_y * neck_w / 2)
-    p4 = (neck_base_x + dx * neck_len + perp_x * neck_w / 2, neck_base_y + dy * neck_len + perp_y * neck_w / 2)
-    d.polygon([p1, p2, p3, p4], outline=a, width=int(5 * s))
+    neck_len = 720 * s
+    neck_w = 56 * s
 
+    # Neck silhouette
+    p1 = (neck_base[0] + perp_x * neck_w / 2, neck_base[1] + perp_y * neck_w / 2)
+    p2 = (neck_base[0] - perp_x * neck_w / 2, neck_base[1] - perp_y * neck_w / 2)
+    p3 = (neck_base[0] + dx * neck_len - perp_x * neck_w / 2, neck_base[1] + dy * neck_len - perp_y * neck_w / 2)
+    p4 = (neck_base[0] + dx * neck_len + perp_x * neck_w / 2, neck_base[1] + dy * neck_len + perp_y * neck_w / 2)
+    d.polygon([p1, p2, p3, p4], outline=a, width=max(2, int(5 * s)))
+
+    # Frets
     for i in range(1, 22):
         t = i / 22
-        fcx = neck_base_x + dx * neck_len * t
-        fcy = neck_base_y + dy * neck_len * t
+        fcx = neck_base[0] + dx * neck_len * t
+        fcy = neck_base[1] + dy * neck_len * t
         fp1 = (fcx + perp_x * neck_w / 2, fcy + perp_y * neck_w / 2)
         fp2 = (fcx - perp_x * neck_w / 2, fcy - perp_y * neck_w / 2)
         d.line([fp1, fp2], fill=(color[0], color[1], color[2], int(alpha * 0.7)), width=1)
-    for i in [3, 5, 7, 9, 12, 15, 17]:
+    # Position dots: offset inlay
+    for i in [3, 5, 7, 9, 12, 15, 17, 19]:
         t = i / 22
-        fcx = neck_base_x + dx * neck_len * t
-        fcy = neck_base_y + dy * neck_len * t
-        d.ellipse([fcx - 5 * s, fcy - 5 * s, fcx + 5 * s, fcy + 5 * s], fill=a)
+        fcx = neck_base[0] + dx * neck_len * t
+        fcy = neck_base[1] + dy * neck_len * t
+        # 12th fret has double dots, others single
+        if i == 12:
+            for off in (-12 * s, 12 * s):
+                ox, oy = perp_x * off, perp_y * off
+                d.ellipse([fcx + ox - 5 * s, fcy + oy - 5 * s, fcx + ox + 5 * s, fcy + oy + 5 * s], fill=a)
+        else:
+            d.ellipse([fcx - 5 * s, fcy - 5 * s, fcx + 5 * s, fcy + 5 * s], fill=a)
 
-    head_cx = neck_base_x + dx * neck_len
-    head_cy = neck_base_y + dy * neck_len
-    head_pts = [
-        (head_cx + perp_x * neck_w / 2, head_cy + perp_y * neck_w / 2),
-        (head_cx + dx * 40 * s + perp_x * neck_w * 1.4, head_cy + dy * 40 * s + perp_y * neck_w * 1.4),
-        (head_cx + dx * 130 * s + perp_x * neck_w * 1.6, head_cy + dy * 130 * s + perp_y * neck_w * 1.6),
-        (head_cx + dx * 180 * s, head_cy + dy * 180 * s),
-        (head_cx + dx * 130 * s - perp_x * neck_w * 0.4, head_cy + dy * 130 * s - perp_y * neck_w * 0.4),
-        (head_cx - perp_x * neck_w / 2, head_cy - perp_y * neck_w / 2),
-    ]
-    d.polygon(head_pts, outline=a, width=int(5 * s))
-    for i in range(6):
-        peg_t = 0.1 + i * 0.13
-        pcx = head_cx + dx * (180 * s * peg_t) + perp_x * neck_w * 1.5
-        pcy = head_cy + dy * (180 * s * peg_t) + perp_y * neck_w * 1.5
-        d.ellipse([pcx - 8 * s, pcy - 8 * s, pcx + 8 * s, pcy + 8 * s], outline=a, width=int(2 * s))
+    # ----- HEADSTOCK (Strat "lollipop" — 6-in-line, swept) -----
+    head_cx = neck_base[0] + dx * neck_len
+    head_cy = neck_base[1] + dy * neck_len
+    # Headstock outline as Bezier chain — characteristic curved Stratocaster shape
+    # Working in neck-local coords (dx, dy = forward; perp = side)
+    def H(forward, side):
+        """Headstock-local point: forward along neck, side perpendicular."""
+        return (head_cx + dx * forward * s + perp_x * side * s,
+                head_cy + dy * forward * s + perp_y * side * s)
 
-    string_a = (color[0], color[1], color[2], int(alpha * 0.55))
+    head_curve = []
+    # Right edge (continues from neck)
+    head_curve.append(H(0, neck_w / s / 2))
+    head_curve += cubic_bezier(H(0, neck_w / s / 2), H(60, 35),  H(140, 50),  H(220, 55), n=16)
+    # Tip
+    head_curve += cubic_bezier(H(220, 55), H(260, 30), H(280, 0), H(280, -30), n=16)
+    # Curve back along the lower edge (where 6 tuners are)
+    head_curve += cubic_bezier(H(280, -30), H(220, -55), H(160, -50), H(80, -45), n=16)
+    # Slight notch where headstock meets neck on the bass side
+    head_curve += cubic_bezier(H(80, -45), H(40, -42), H(20, -38), H(0, -neck_w / s / 2), n=12)
+
+    for i in range(len(head_curve) - 1):
+        d.line([head_curve[i], head_curve[i + 1]], fill=a, width=max(2, int(4 * s)))
+    # Close back to neck top via the neck edges (already drawn)
+
+    # 6 tuning pegs along the lower edge (audience-side of headstock)
     for i in range(6):
-        str_start = (br_x + (i - 2.5) * 14 * s, br_y - 10 * s)
-        str_end = (
-            head_cx + dx * (40 * s + i * 30 * s) + perp_x * (neck_w * 0.35 + (i - 2.5) * 6 * s),
-            head_cy + dy * (40 * s + i * 30 * s) + perp_y * (neck_w * 0.35 + (i - 2.5) * 6 * s)
-        )
-        d.line([str_start, str_end], fill=string_a, width=1)
+        peg_t = 0.18 + i * 0.13
+        pcx = head_cx + dx * 200 * s * peg_t + perp_x * (-50 * s)
+        pcy = head_cy + dy * 200 * s * peg_t + perp_y * (-50 * s)
+        # Tuner button (white circle)
+        d.ellipse([pcx - 11 * s, pcy - 11 * s, pcx + 11 * s, pcy + 11 * s], outline=a, width=max(1, int(2 * s)))
+        # Center post
+        d.ellipse([pcx - 4 * s, pcy - 4 * s, pcx + 4 * s, pcy + 4 * s], fill=a)
+        # Tuner stem reaching string
+        stem_len = 30 * s
+        d.line([(pcx, pcy), (pcx + perp_x * stem_len * 0.6 + dx * stem_len * 0.3,
+                              pcy + perp_y * stem_len * 0.6 + dy * stem_len * 0.3)],
+               fill=a, width=max(1, int(2 * s)))
+
+    # ----- 6 STRINGS — bridge to headstock -----
+    string_a = (color[0], color[1], color[2], int(alpha * 0.5))
+    bridge_y = br_cy - br_h / 2
+    for i in range(6):
+        # Spread strings across bridge width and gradually narrow toward headstock
+        bridge_x_off = -br_w / 2 + 12 * s + (i * (br_w - 24 * s) / 5)
+        str_start = (br_cx + bridge_x_off, bridge_y - 4 * s)
+        # End point: tuners along the headstock — convert tuner index to (i)
+        tuner_t = 0.18 + i * 0.13
+        end_x = head_cx + dx * 200 * s * tuner_t + perp_x * (-30 * s)
+        end_y = head_cy + dy * 200 * s * tuner_t + perp_y * (-30 * s)
+        d.line([str_start, (end_x, end_y)], fill=string_a, width=1)
 
     return layer
 

@@ -47,7 +47,7 @@ export default function Footer() {
             display: 'inline-block',
             marginLeft: 10,
             fontSize: '0.78rem',
-            opacity: 0.8,
+            color: '#ffffff',
             fontStyle: 'italic'
           }}>
             — Smart sites &amp; smart SEO that get your business found.

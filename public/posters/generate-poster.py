@@ -23,6 +23,9 @@ MAROON = (123, 30, 45)
 EMBER = (168, 56, 50)
 GOLD = (201, 162, 39)
 GOLD_SOFT = (212, 180, 89)
+DEEP_AMBER = (148, 100, 25)
+DEEP_BLUE = (38, 70, 120)
+NAVY = (28, 52, 92)
 DARK = (30, 25, 21)
 INK = (47, 36, 31)
 MUTED = (112, 95, 80)
@@ -112,16 +115,14 @@ def cubic_bezier(p0, p1, p2, p3, n=24):
 
 def child_singer(W, H, cx, cy, scale, color, alpha):
     """
-    Stylised side-profile silhouette of a small child standing on tiptoes,
-    reaching up toward a vintage microphone on a stand.
+    Side-profile silhouette of a small child up on tiptoes, body leaning
+    forward, head tilted upward — straining to reach a microphone that
+    hangs from a bent boom stand. Profile faces RIGHT.
 
-    Built from simple, robust primitives (ellipses, rectangles, straight
-    lines and small Bezier flourishes for the hair) so it renders cleanly
-    at any scale.
-
-    Local coordinates: (0,0) sits roughly at the child's chest level.
-    The microphone floats at (60, -360); ground line is at y = +260.
-    Profile faces RIGHT (toward the mic).
+    Local coordinates: (0,0) sits at the child's chest level. Ground at
+    y = +286. The mic stand pole rises from a base at x ≈ +160; its boom
+    arm curves UP and back over the child so the mic head sits just above
+    and slightly forward of the child's open mouth.
     """
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
@@ -131,11 +132,8 @@ def child_singer(W, H, cx, cy, scale, color, alpha):
     def P(x, y):
         return (cx + x * s, cy + y * s)
 
-    # Helpers --------------------------------------------------------------
     def thick_line(p0, p1, thickness):
-        """Draw a thick line with rounded caps."""
         d.line([p0, p1], fill=a, width=int(thickness))
-        # Rounded caps
         r = int(thickness / 2)
         d.ellipse([p0[0] - r, p0[1] - r, p0[0] + r, p0[1] + r], fill=a)
         d.ellipse([p1[0] - r, p1[1] - r, p1[0] + r, p1[1] + r], fill=a)
@@ -143,117 +141,161 @@ def child_singer(W, H, cx, cy, scale, color, alpha):
     def filled_ellipse(cx_, cy_, rx, ry):
         d.ellipse([cx_ - rx, cy_ - ry, cx_ + rx, cy_ + ry], fill=a)
 
-    # ----- BODY (rounded teardrop, leaning forward toward mic) -----
-    # Drawn as a polygon with smooth Bezier-sampled curves.
-    # Keep the shape simple and clearly readable.
+    def thick_curve(pts, thickness):
+        for i in range(len(pts) - 1):
+            d.line([pts[i], pts[i + 1]], fill=a, width=int(thickness))
+        r = int(thickness / 2)
+        d.ellipse([pts[0][0] - r, pts[0][1] - r, pts[0][0] + r, pts[0][1] + r], fill=a)
+        d.ellipse([pts[-1][0] - r, pts[-1][1] - r, pts[-1][0] + r, pts[-1][1] + r], fill=a)
+
+    # ----- BODY (leaning forward — front line bulges out, back line tilts forward) -----
     body = []
-    body += cubic_bezier(P(28, -180), P(48, -130), P(50, -60), P(40, 30), n=24)    # front of torso
+    body += cubic_bezier(P(38, -190), P(58, -130), P(54, -60), P(40, 30), n=24)    # front torso
     body += cubic_bezier(P(40, 30), P(38, 80), P(32, 110), P(20, 130), n=20)        # hip front
     body += cubic_bezier(P(20, 130), P(0, 135), P(-25, 132), P(-40, 125), n=14)     # bottom of torso
-    body += cubic_bezier(P(-40, 125), P(-46, 80), P(-46, 30), P(-44, -30), n=20)    # back side
-    body += cubic_bezier(P(-44, -30), P(-42, -90), P(-36, -140), P(-26, -180), n=22) # back to neck
-    body += cubic_bezier(P(-26, -180), P(-10, -185), P(15, -185), P(28, -180), n=14) # neck top
+    body += cubic_bezier(P(-40, 125), P(-46, 80), P(-46, 30), P(-42, -30), n=20)    # back lower
+    body += cubic_bezier(P(-42, -30), P(-36, -90), P(-26, -140), P(-12, -185), n=22) # back upper (forward lean)
+    body += cubic_bezier(P(-12, -185), P(8, -198), P(28, -198), P(38, -190), n=14)   # neck/shoulders
     d.polygon(body, fill=a)
 
-    # ----- HEAD (clean circle on top of torso) -----
-    head_cx, head_cy = P(0, -240)
-    head_r = 52 * s
-    filled_ellipse(head_cx, head_cy, head_r, head_r * 1.05)
+    # ----- HEAD (tilted UP — drawn as a rotated egg) -----
+    head_cx_v, head_cy_v = P(18, -255)
+    rx_h, ry_h = 50 * s, 56 * s
+    angle = math.radians(-22)  # negative => face tilts up & forward
+    cos_a, sin_a = math.cos(angle), math.sin(angle)
+    head_pts = []
+    for i in range(60):
+        t = i / 60 * 2 * math.pi
+        # Egg shape: slightly fatter at the chin (positive y when un-rotated).
+        ex = rx_h * math.cos(t)
+        ey = ry_h * math.sin(t) * (1.0 + 0.08 * math.sin(t))
+        rpx = ex * cos_a - ey * sin_a
+        rpy = ex * sin_a + ey * cos_a
+        head_pts.append((head_cx_v + rpx, head_cy_v + rpy))
+    d.polygon(head_pts, fill=a)
 
-    # ----- HAIR / PONYTAIL flowing back to the LEFT -----
+    # Open singing mouth — a small cream-coloured oval at the front-top of
+    # the head, tilted so it visually "opens" upward toward the mic.
+    mouth_cx, mouth_cy = P(58, -278)
+    m_rx, m_ry = 7 * s, 13 * s
+    m_ang = math.radians(-30)
+    m_cos, m_sin = math.cos(m_ang), math.sin(m_ang)
+    m_pts = []
+    for i in range(24):
+        t = i / 24 * 2 * math.pi
+        mx = m_rx * math.cos(t)
+        my = m_ry * math.sin(t)
+        m_pts.append((mouth_cx + mx * m_cos - my * m_sin,
+                      mouth_cy + mx * m_sin + my * m_cos))
+    d.polygon(m_pts, fill=(CREAM[0], CREAM[1], CREAM[2], min(255, alpha + 60)))
+
+    # ----- HAIR / PONYTAIL — trails back-down behind the tilted head -----
     pony = []
-    pony += cubic_bezier(P(-20, -260), P(-50, -250), P(-78, -230), P(-92, -200), n=18)
-    pony += cubic_bezier(P(-92, -200), P(-100, -180), P(-95, -165), P(-82, -168), n=14)
-    pony += cubic_bezier(P(-82, -168), P(-65, -180), P(-50, -200), P(-35, -220), n=14)
-    pony += cubic_bezier(P(-35, -220), P(-25, -235), P(-22, -250), P(-25, -260), n=10)
+    pony += cubic_bezier(P(-25, -260), P(-60, -240), P(-90, -210), P(-100, -175), n=18)
+    pony += cubic_bezier(P(-100, -175), P(-105, -150), P(-95, -140), P(-80, -150), n=14)
+    pony += cubic_bezier(P(-80, -150), P(-58, -180), P(-42, -210), P(-30, -235), n=14)
+    pony += cubic_bezier(P(-30, -235), P(-22, -250), P(-22, -260), P(-26, -265), n=10)
     d.polygon(pony, fill=a)
 
-    # Subtle hair-strand line along the top of the head suggesting hairline
-    hairline = cubic_bezier(P(20, -275), P(0, -290), P(-25, -285), P(-40, -270), n=16)
-    for i in range(len(hairline) - 1):
-        d.line([hairline[i], hairline[i + 1]], fill=a, width=max(2, int(3 * s)))
-
-    # ----- FRONT ARM raised up to mic -----
-    # Upper arm (shoulder to elbow)
-    shoulder = P(20, -170)
-    elbow = P(48, -260)
-    wrist = P(60, -340)
+    # ----- FRONT ARM stretched UP toward the mic -----
+    shoulder = P(30, -180)
+    elbow = P(58, -270)
+    wrist = P(78, -355)
     thick_line(shoulder, elbow, max(6, int(22 * s)))
     thick_line(elbow, wrist, max(6, int(20 * s)))
-    # Hand (small oval) wrapping around mic stand
+    # Hand reaching just below mic capsule
     d.ellipse([wrist[0] - 14 * s, wrist[1] - 14 * s, wrist[0] + 14 * s, wrist[1] + 14 * s], fill=a)
 
-    # ----- BACK ARM bent slightly back for balance -----
-    shoulder2 = P(-25, -170)
-    elbow2 = P(-55, -110)
-    wrist2 = P(-50, -50)
+    # ----- BACK ARM — bent for balance, swung behind the body -----
+    shoulder2 = P(-22, -170)
+    elbow2 = P(-65, -100)
+    wrist2 = P(-72, -25)
     thick_line(shoulder2, elbow2, max(6, int(20 * s)))
     thick_line(elbow2, wrist2, max(6, int(18 * s)))
     d.ellipse([wrist2[0] - 12 * s, wrist2[1] - 12 * s, wrist2[0] + 12 * s, wrist2[1] + 12 * s], fill=a)
 
-    # ----- LEGS — front leg on tiptoes, back leg slightly behind -----
-    # Front leg (right side of body — closer to mic)
+    # ----- LEGS — both clearly on tiptoes, front leg straining higher -----
     hip_front = P(15, 125)
-    knee_front = P(20, 200)
-    ankle_front = P(25, 255)
+    knee_front = P(22, 198)
+    ankle_front = P(30, 258)
     thick_line(hip_front, knee_front, max(8, int(28 * s)))
     thick_line(knee_front, ankle_front, max(8, int(24 * s)))
-    # Front foot — pointed toe forward, heel raised
     foot_pts_f = [
         ankle_front,
-        (ankle_front[0] + 38 * s, ankle_front[1] + 15 * s),
-        (ankle_front[0] + 35 * s, ankle_front[1] + 22 * s),
-        (ankle_front[0] - 5 * s, ankle_front[1] + 18 * s),
+        (ankle_front[0] + 44 * s, ankle_front[1] + 18 * s),
+        (ankle_front[0] + 40 * s, ankle_front[1] + 26 * s),
+        (ankle_front[0] - 6 * s, ankle_front[1] + 22 * s),
     ]
     d.polygon(foot_pts_f, fill=a)
 
-    # Back leg (left side of body)
     hip_back = P(-25, 125)
-    knee_back = P(-22, 200)
-    ankle_back = P(-15, 255)
+    knee_back = P(-22, 198)
+    ankle_back = P(-15, 254)
     thick_line(hip_back, knee_back, max(8, int(26 * s)))
     thick_line(knee_back, ankle_back, max(8, int(22 * s)))
     foot_pts_b = [
         ankle_back,
-        (ankle_back[0] + 28 * s, ankle_back[1] + 14 * s),
-        (ankle_back[0] + 25 * s, ankle_back[1] + 20 * s),
-        (ankle_back[0] - 12 * s, ankle_back[1] + 16 * s),
+        (ankle_back[0] + 32 * s, ankle_back[1] + 16 * s),
+        (ankle_back[0] + 28 * s, ankle_back[1] + 22 * s),
+        (ankle_back[0] - 12 * s, ankle_back[1] + 18 * s),
     ]
     d.polygon(foot_pts_b, fill=a)
 
     # ----- GROUND LINE -----
-    ground_y = ankle_front[1] + 26 * s
-    d.line([(P(-90, 0)[0], ground_y), (P(95, 0)[0], ground_y)], fill=a, width=max(2, int(3 * s)))
+    ground_y = ankle_front[1] + 28 * s
+    d.line([(P(-110, 0)[0], ground_y), (P(180, 0)[0], ground_y)], fill=a, width=max(2, int(3 * s)))
 
-    # ----- MICROPHONE (vintage / radio-show style) -----
-    mic_top = P(60, -380)
-    mic_r = 30 * s
-    # Head — slightly egg-shaped
-    d.ellipse([mic_top[0] - mic_r, mic_top[1] - mic_r * 1.05, mic_top[0] + mic_r, mic_top[1] + mic_r], fill=a)
-    # Mesh lines (white, low-alpha) suggesting a windscreen
-    for i in range(-2, 3):
-        line_x = mic_top[0] + i * (mic_r * 0.45)
-        ratio = abs(i) / 2.5
-        h = mic_r * (1.0 - ratio ** 1.8)
-        if h > 0:
-            d.line([(line_x, mic_top[1] - h), (line_x, mic_top[1] + h * 0.85)],
-                   fill=(255, 255, 255, int(alpha * 0.45)), width=1)
-    # Capsule body just below the head
-    cap_top_y = mic_top[1] + mic_r * 0.85
-    cap_bot_y = cap_top_y + 28 * s
-    d.rectangle([mic_top[0] - mic_r * 0.42, cap_top_y, mic_top[0] + mic_r * 0.42, cap_bot_y], fill=a)
-    # Cap-bottom pivot attaching mic to stand
-    d.rectangle([mic_top[0] - 6 * s, cap_bot_y, mic_top[0] + 6 * s, cap_bot_y + 18 * s], fill=a)
-
-    # ----- MIC STAND (slim vertical pole + base on the ground) -----
-    pole_top = (mic_top[0], cap_bot_y + 18 * s)
-    pole_bot = (mic_top[0] - 6 * s, ground_y - 4 * s)
-    thick_line(pole_top, pole_bot, max(4, int(7 * s)))
-    # Stand base (small disc on the ground)
-    base_w = 56 * s
-    base_h = 12 * s
+    # ----- BENT BOOM MIC STAND -----
+    # Vertical pole rises from a base on the right of the figure...
+    pole_bot = P(160, 256)
+    pole_top = P(160, -340)
+    thick_line(pole_top, pole_bot, max(5, int(8 * s)))
+    # ...with a small base disc on the ground.
+    base_w = 64 * s
+    base_h = 14 * s
     d.ellipse([pole_bot[0] - base_w / 2, ground_y - base_h / 2,
                pole_bot[0] + base_w / 2, ground_y + base_h / 2], fill=a)
+
+    # The boom arm — curves up and OVER from the top of the pole to bring
+    # the mic forward & down to the child's mouth.  This is the classic
+    # "bent" stage-mic silhouette.
+    boom_start = pole_top
+    boom_ctrl1 = P(160, -420)
+    boom_ctrl2 = P(110, -420)
+    boom_end = P(78, -345)
+    boom_pts = cubic_bezier(boom_start, boom_ctrl1, boom_ctrl2, boom_end, n=32)
+    thick_curve(boom_pts, max(5, int(7 * s)))
+
+    # Mic capsule hanging from the boom end, tilted toward the child's mouth
+    mic_cx, mic_cy = P(72, -320)
+    mic_r = 28 * s
+    # Short connector from boom tip to mic body
+    thick_line(boom_end, (mic_cx, mic_cy - mic_r * 0.9), max(4, int(6 * s)))
+    # Mic head (egg-shape, slightly tilted toward mouth)
+    head_pts_m = []
+    mic_angle = math.radians(20)  # tilts mic toward the child's mouth
+    cos_m, sin_m = math.cos(mic_angle), math.sin(mic_angle)
+    for i in range(40):
+        t = i / 40 * 2 * math.pi
+        mx = mic_r * 0.95 * math.cos(t)
+        my = mic_r * 1.10 * math.sin(t)
+        head_pts_m.append((mic_cx + mx * cos_m - my * sin_m,
+                           mic_cy + mx * sin_m + my * cos_m))
+    d.polygon(head_pts_m, fill=a)
+    # Windscreen mesh suggestion
+    for i in range(-2, 3):
+        ang_off = i * 0.3
+        x_off = mic_r * 0.85 * math.sin(ang_off)
+        y_off = -mic_r * 0.85 * math.cos(ang_off)
+        x_b = mic_r * 0.85 * math.sin(ang_off)
+        y_b = mic_r * 0.85 * math.cos(ang_off)
+        # Rotate offsets into mic frame
+        sx1 = x_off * cos_m - y_off * sin_m
+        sy1 = x_off * sin_m + y_off * cos_m
+        sx2 = x_b * cos_m - y_b * sin_m
+        sy2 = x_b * sin_m + y_b * cos_m
+        d.line([(mic_cx + sx1, mic_cy + sy1), (mic_cx + sx2, mic_cy + sy2)],
+               fill=(255, 255, 255, int(alpha * 0.45)), width=1)
 
     return layer
 
@@ -315,32 +357,55 @@ def render_portrait(W=BASE_W, H=BASE_H, headline_size=156):
         draw_diamond(draw, cx, cy, max(5, int(7 * (W / BASE_W))), fill=GOLD)
         draw_diamond(draw, cx, cy, max(2, int(3 * (W / BASE_W))), fill=MAROON)
 
-    # Background guitar
+    # Singer silhouette — the visual hero of the poster.
     sf = W / BASE_W  # scale factor
-    # Place the singer on the right-hand side, between the headline and the
-    # registrations panel — visible but not competing with text.
-    g = child_singer(W, H, int(W // 2 + 480 * sf), int(H // 2 + 100 * sf), 1.05 * sf, MAROON, 90)
+    # Positioned in the right column, sized so the WHOLE figure fits in the
+    # clear band between the SHOWCASE headline and the registrations panel.
+    # Kept at a softer alpha so headline / bullets / panel text stay crisp.
+    g = child_singer(W, H,
+                     int(W // 2 + 380 * sf),
+                     int(H // 2 - 110 * sf),
+                     0.92 * sf, MAROON, 105)
     img.paste(g, (0, 0), g)
 
-    # Music notes — scattered across the page like notes drifting up from the singer
+    # Music notes — generously scattered, in the deeper poster palette so
+    # they read clearly against the cream background.
     notes_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     nd = ImageDraw.Draw(notes_layer)
     for cx, cy, sc, col, kind, alpha in [
-        # Floating up from around the singer (lower-left of poster)
-        (int(280 * sf), int(1820 * sf), 0.50 * sf, EMBER, 'eighth', 130),
-        (int(420 * sf), int(1700 * sf), 0.42 * sf, GOLD, 'quarter', 120),
-        (int(560 * sf), int(1580 * sf), 0.48 * sf, MAROON, 'beam', 115),
-        (int(370 * sf), int(1440 * sf), 0.40 * sf, GOLD_SOFT, 'eighth', 110),
-        # Notes around the headline / upper third
-        (int(300 * sf), int(450 * sf), 0.55 * sf, GOLD_SOFT, 'beam', 110),
-        (int(1340 * sf), int(380 * sf), 0.5 * sf, EMBER, 'eighth', 105),
-        (int(1180 * sf), int(540 * sf), 0.42 * sf, GOLD, 'quarter', 100),
-        # Right column — opposite the singer
-        (int(1380 * sf), int(900 * sf), 0.45 * sf, MAROON, 'eighth', 105),
-        (int(1300 * sf), int(1100 * sf), 0.55 * sf, GOLD, 'beam', 95),
-        (int(1450 * sf), int(1320 * sf), 0.40 * sf, EMBER, 'quarter', 100),
-        # Lower right — sparse so footer breathes
-        (int(1380 * sf), int(1620 * sf), 0.45 * sf, GOLD_SOFT, 'eighth', 90),
+        # Pulled IN to flank each headline word — sits in the empty space
+        # just beside the centred letters, giving a "between the words" feel.
+        (int(440 * sf),  int(400 * sf),  0.40 * sf, MAROON,    'eighth',  205),  # left of MUSICAL
+        (int(1180 * sf), int(400 * sf),  0.40 * sf, DEEP_BLUE, 'quarter', 205),  # right of MUSICAL
+        (int(420 * sf),  int(560 * sf),  0.42 * sf, GOLD,      'beam',    205),  # left of TALENT
+        (int(1180 * sf), int(560 * sf),  0.40 * sf, NAVY,      'eighth',  210),  # right of TALENT
+        (int(430 * sf),  int(720 * sf),  0.42 * sf, NAVY,      'quarter', 210),  # left of SHOWCASE
+        (int(1180 * sf), int(720 * sf),  0.40 * sf, GOLD,      'eighth',  205),  # right of SHOWCASE
+
+        # Tucked just below SHOWCASE, flanking the tagline
+        (int(450 * sf),  int(840 * sf),  0.32 * sf, DEEP_BLUE, 'eighth',  185),
+        (int(1170 * sf), int(840 * sf),  0.32 * sf, MAROON,    'quarter', 185),
+
+        # Drifting UP and AWAY from the singer's mic — three rising notes
+        (int(1280 * sf), int(720 * sf),  0.38 * sf, MAROON,    'eighth',  210),
+        (int(1370 * sf), int(620 * sf),  0.42 * sf, NAVY,      'quarter', 205),
+        (int(1230 * sf), int(540 * sf),  0.46 * sf, GOLD,      'beam',    195),
+
+        # A subtle pair flanking the tagline / gates band — pulled in
+        (int(560 * sf),  int(990 * sf),  0.34 * sf, NAVY,      'quarter', 180),
+        (int(1080 * sf), int(990 * sf),  0.32 * sf, MAROON,    'eighth',  180),
+
+        # One on each side of the bullets — sparse
+        (int(200 * sf),  int(1240 * sf), 0.40 * sf, DEEP_BLUE, 'quarter', 195),
+        (int(1485 * sf), int(1320 * sf), 0.38 * sf, EMBER,     'eighth',  190),
+
+        # Just below the panel (audience-tickets band)
+        (int(240 * sf),  int(1780 * sf), 0.44 * sf, NAVY,      'beam',    195),
+        (int(1420 * sf), int(1780 * sf), 0.42 * sf, EMBER,     'eighth',  195),
+
+        # Bottom flourish near venue / sponsor — quieter, single per side
+        (int(260 * sf),  int(2160 * sf), 0.38 * sf, MAROON,    'eighth',  170),
+        (int(1400 * sf), int(2160 * sf), 0.38 * sf, DEEP_BLUE, 'quarter', 180),
     ]:
         if kind == 'beam':
             draw_beamed_pair(nd, cx, cy, sc, col, alpha)
@@ -388,11 +453,12 @@ def render_portrait(W=BASE_W, H=BASE_H, headline_size=156):
     draw.text((center_x_for("SHOWCASE", f_h1), y), "SHOWCASE", fill=EMBER, font=f_h1)
     y += int(line_h * 1.1)
 
-    # Tagline directly under the title — small caps in gold
-    f_tag = font("InstrumentSans-Bold.ttf", int(24 * sf))
+    # Tagline directly under the title — small caps in deep amber for
+    # stronger contrast against the cream paper.
+    f_tag = font("InstrumentSans-Bold.ttf", int(28 * sf))
     tag_text = "LIVE  MUSIC  ·  LIVE  JUDGES  ·  LOCAL  TALENT"
     tag_w = draw.textlength(tag_text, font=f_tag)
-    draw.text(((W - tag_w) // 2, y), tag_text, fill=GOLD, font=f_tag)
+    draw.text(((W - tag_w) // 2, y), tag_text, fill=DEEP_AMBER, font=f_tag)
     y += int(50 * sf)
 
     # Ornament line
@@ -438,7 +504,10 @@ def render_portrait(W=BASE_W, H=BASE_H, headline_size=156):
     panel_top = y
     panel_h = int(360 * sf)
     panel_x1, panel_x2 = margin + int(80 * sf), W - margin - int(80 * sf)
-    draw.rectangle([panel_x1, panel_top, panel_x2, panel_top + panel_h], fill=MAROON)
+    # Slightly translucent panel — lets the singer silhouette show through
+    # if any part of her overlaps the panel area, while still keeping the
+    # cream/gold text readable.
+    draw.rectangle([panel_x1, panel_top, panel_x2, panel_top + panel_h], fill=MAROON + (215,))
     draw.rectangle([panel_x1 + int(18 * sf), panel_top + int(18 * sf),
                     panel_x2 - int(18 * sf), panel_top + panel_h - int(18 * sf)],
                    outline=GOLD, width=2)

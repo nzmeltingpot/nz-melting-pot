@@ -173,6 +173,102 @@ export default function TalentShowcase() {
         </div>
       </section>
 
+      {/* Poster — printable / shareable artwork for the event */}
+      <section
+        id="poster"
+        style={{ padding: '64px 20px 48px', background: 'var(--color-cream, #FBF5ED)' }}>
+
+        <div className="container reveal" style={{ maxWidth: 1100 }}>
+          <div style={{ textAlign: 'center', marginBottom: 28 }}>
+            <p className="text-accent">Spread the Word</p>
+            <h2 style={{ marginBottom: 8 }}>Download &amp; Share the Poster</h2>
+            <p style={{ maxWidth: 640, margin: '0 auto', color: '#374151' }}>
+              Pin it up at your school, workplace, or community space — or share it
+              on socials. Available in print-ready and Instagram-friendly sizes.
+            </p>
+          </div>
+
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 24
+          }}>
+            <a
+              href="/posters/talent-showcase-2026-poster.png"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open the full-size Musical Talent Showcase 2026 poster in a new tab"
+              style={{
+                display: 'block',
+                maxWidth: 460,
+                width: '100%',
+                borderRadius: 12,
+                overflow: 'hidden',
+                boxShadow: '0 12px 36px rgba(30, 25, 21, 0.18)',
+                border: '1px solid #e2e8f0',
+                background: '#fff',
+                transition: 'transform 0.25s ease, box-shadow 0.25s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 18px 44px rgba(30, 25, 21, 0.22)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 12px 36px rgba(30, 25, 21, 0.18)';
+              }}>
+
+              <img
+                src="/posters/talent-showcase-2026-poster.png"
+                alt="Musical Talent Showcase 2026 poster — Saturday 18 July, Blockhouse Bay Community Centre, Auckland"
+                loading="lazy"
+                width="800"
+                height="1185"
+                style={{ width: '100%', height: 'auto', display: 'block' }} />
+
+            </a>
+
+            <div style={{
+              display: 'flex',
+              gap: 10,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              maxWidth: 720
+            }}>
+              <a
+                href="/posters/talent-showcase-2026-poster.png"
+                download
+                className="btn btn--primary">
+
+                Download A4
+              </a>
+              <a
+                href="/posters/talent-showcase-2026-poster-print-A3.png"
+                download
+                className="btn btn--outline">
+
+                A3 print (300 dpi)
+              </a>
+              <a
+                href="/posters/talent-showcase-2026-poster-square.png"
+                download
+                className="btn btn--outline">
+
+                Instagram square
+              </a>
+              <a
+                href="/posters/talent-showcase-2026-poster-story.png"
+                download
+                className="btn btn--outline">
+
+                Instagram story
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Sponsor banner — placed just above the Sign-Up section */}
       <section id="sponsor" style={{ padding: '40px 20px 24px', background: 'var(--color-cream, #FBF5ED)' }}>
         <div className="container reveal" style={{ maxWidth: 900 }}>

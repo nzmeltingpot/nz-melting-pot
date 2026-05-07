@@ -20,7 +20,9 @@ LOGO = os.path.join(HERE, "..", "images", "branding", "logo-300x300.png")
 CREAM = (251, 245, 237)
 DEEP_CREAM = (242, 232, 217)
 MAROON = (123, 30, 45)
+DEEP_MAROON = (84, 18, 36)         # richer burgundy — for borders + headline pop
 EMBER = (168, 56, 50)
+DEEP_EMBER = (132, 38, 40)         # deeper red-brown for SHOWCASE punch
 GOLD = (201, 162, 39)
 GOLD_SOFT = (212, 180, 89)
 DEEP_AMBER = (148, 100, 25)
@@ -324,19 +326,20 @@ def render_portrait(W=BASE_W, H=BASE_H, headline_size=156):
 
     draw = ImageDraw.Draw(img, "RGBA")
 
-    # Multi-line border + diamond ornaments
+    # Multi-line border + diamond ornaments — outer line in DEEP_MAROON for
+    # extra weight, inner accents echo the deeper palette.
     margin = int(90 * (W / BASE_W))
-    o_thick = max(6, int(8 * (W / BASE_W)))
-    draw.rectangle([margin, margin, W - margin, H - margin], outline=MAROON + (255,), width=o_thick)
+    o_thick = max(7, int(10 * (W / BASE_W)))
+    draw.rectangle([margin, margin, W - margin, H - margin], outline=DEEP_MAROON + (255,), width=o_thick)
     gap1 = int(22 * (W / BASE_W))
     draw.rectangle([margin + gap1, margin + gap1, W - margin - gap1, H - margin - gap1],
                    outline=GOLD + (255,), width=max(3, int(4 * (W / BASE_W))))
     gap2 = gap1 + int(14 * (W / BASE_W))
     draw.rectangle([margin + gap2, margin + gap2, W - margin - gap2, H - margin - gap2],
-                   outline=MAROON + (200,), width=1)
+                   outline=DEEP_MAROON + (220,), width=1)
     gap3 = gap2 + int(12 * (W / BASE_W))
     draw.rectangle([margin + gap3, margin + gap3, W - margin - gap3, H - margin - gap3],
-                   outline=GOLD + (110,), width=1)
+                   outline=GOLD + (140,), width=1)
 
     diam_size = max(7, int(9 * (W / BASE_W)))
     inner_diam = max(3, int(4 * (W / BASE_W)))
@@ -361,11 +364,12 @@ def render_portrait(W=BASE_W, H=BASE_H, headline_size=156):
     sf = W / BASE_W  # scale factor
     # Positioned in the right column, sized so the WHOLE figure fits in the
     # clear band between the SHOWCASE headline and the registrations panel.
-    # Kept at a softer alpha so headline / bullets / panel text stay crisp.
+    # Drawn in DEEP_MAROON at a stronger alpha so she reads as a bolder
+    # silhouette without overwhelming the surrounding text.
     g = child_singer(W, H,
                      int(W // 2 + 380 * sf),
                      int(H // 2 - 110 * sf),
-                     0.92 * sf, MAROON, 105)
+                     0.92 * sf, DEEP_MAROON, 140)
     img.paste(g, (0, 0), g)
 
     # Music notes — generously scattered, in the deeper poster palette so
@@ -375,37 +379,37 @@ def render_portrait(W=BASE_W, H=BASE_H, headline_size=156):
     for cx, cy, sc, col, kind, alpha in [
         # Pulled IN to flank each headline word — sits in the empty space
         # just beside the centred letters, giving a "between the words" feel.
-        (int(440 * sf),  int(400 * sf),  0.40 * sf, MAROON,    'eighth',  205),  # left of MUSICAL
-        (int(1180 * sf), int(400 * sf),  0.40 * sf, DEEP_BLUE, 'quarter', 205),  # right of MUSICAL
-        (int(420 * sf),  int(560 * sf),  0.42 * sf, GOLD,      'beam',    205),  # left of TALENT
-        (int(1180 * sf), int(560 * sf),  0.40 * sf, NAVY,      'eighth',  210),  # right of TALENT
-        (int(430 * sf),  int(720 * sf),  0.42 * sf, NAVY,      'quarter', 210),  # left of SHOWCASE
-        (int(1180 * sf), int(720 * sf),  0.40 * sf, GOLD,      'eighth',  205),  # right of SHOWCASE
+        (int(440 * sf),  int(400 * sf),  0.40 * sf, DEEP_MAROON, 'eighth',  240),  # left of MUSICAL
+        (int(1180 * sf), int(400 * sf),  0.40 * sf, NAVY,        'quarter', 240),  # right of MUSICAL
+        (int(420 * sf),  int(560 * sf),  0.42 * sf, GOLD,        'beam',    235),  # left of TALENT
+        (int(1180 * sf), int(560 * sf),  0.40 * sf, NAVY,        'eighth',  245),  # right of TALENT
+        (int(430 * sf),  int(720 * sf),  0.42 * sf, NAVY,        'quarter', 245),  # left of SHOWCASE
+        (int(1180 * sf), int(720 * sf),  0.40 * sf, DEEP_AMBER,  'eighth',  240),  # right of SHOWCASE
 
         # Tucked just below SHOWCASE, flanking the tagline
-        (int(450 * sf),  int(840 * sf),  0.32 * sf, DEEP_BLUE, 'eighth',  185),
-        (int(1170 * sf), int(840 * sf),  0.32 * sf, MAROON,    'quarter', 185),
+        (int(450 * sf),  int(840 * sf),  0.32 * sf, DEEP_BLUE,   'eighth',  220),
+        (int(1170 * sf), int(840 * sf),  0.32 * sf, DEEP_MAROON, 'quarter', 220),
 
         # Drifting UP and AWAY from the singer's mic — three rising notes
-        (int(1280 * sf), int(720 * sf),  0.38 * sf, MAROON,    'eighth',  210),
-        (int(1370 * sf), int(620 * sf),  0.42 * sf, NAVY,      'quarter', 205),
-        (int(1230 * sf), int(540 * sf),  0.46 * sf, GOLD,      'beam',    195),
+        (int(1280 * sf), int(720 * sf),  0.38 * sf, DEEP_MAROON, 'eighth',  245),
+        (int(1370 * sf), int(620 * sf),  0.42 * sf, NAVY,        'quarter', 240),
+        (int(1230 * sf), int(540 * sf),  0.46 * sf, DEEP_AMBER,  'beam',    230),
 
         # A subtle pair flanking the tagline / gates band — pulled in
-        (int(560 * sf),  int(990 * sf),  0.34 * sf, NAVY,      'quarter', 180),
-        (int(1080 * sf), int(990 * sf),  0.32 * sf, MAROON,    'eighth',  180),
+        (int(560 * sf),  int(990 * sf),  0.34 * sf, NAVY,        'quarter', 215),
+        (int(1080 * sf), int(990 * sf),  0.32 * sf, DEEP_MAROON, 'eighth',  215),
 
         # One on each side of the bullets — sparse
-        (int(200 * sf),  int(1240 * sf), 0.40 * sf, DEEP_BLUE, 'quarter', 195),
-        (int(1485 * sf), int(1320 * sf), 0.38 * sf, EMBER,     'eighth',  190),
+        (int(200 * sf),  int(1240 * sf), 0.40 * sf, DEEP_BLUE,   'quarter', 230),
+        (int(1485 * sf), int(1320 * sf), 0.38 * sf, DEEP_EMBER,  'eighth',  225),
 
         # Just below the panel (audience-tickets band)
-        (int(240 * sf),  int(1780 * sf), 0.44 * sf, NAVY,      'beam',    195),
-        (int(1420 * sf), int(1780 * sf), 0.42 * sf, EMBER,     'eighth',  195),
+        (int(240 * sf),  int(1780 * sf), 0.44 * sf, NAVY,        'beam',    230),
+        (int(1420 * sf), int(1780 * sf), 0.42 * sf, DEEP_EMBER,  'eighth',  230),
 
         # Bottom flourish near venue / sponsor — quieter, single per side
-        (int(260 * sf),  int(2160 * sf), 0.38 * sf, MAROON,    'eighth',  170),
-        (int(1400 * sf), int(2160 * sf), 0.38 * sf, DEEP_BLUE, 'quarter', 180),
+        (int(260 * sf),  int(2160 * sf), 0.38 * sf, DEEP_MAROON, 'eighth',  205),
+        (int(1400 * sf), int(2160 * sf), 0.38 * sf, DEEP_BLUE,   'quarter', 215),
     ]:
         if kind == 'beam':
             draw_beamed_pair(nd, cx, cy, sc, col, alpha)
@@ -447,10 +451,10 @@ def render_portrait(W=BASE_W, H=BASE_H, headline_size=156):
 
     line_h = int(headline_size * 1.04 * sf)
     y = title_top
-    for line, color in [("MUSICAL", MAROON), ("TALENT", MAROON)]:
+    for line, color in [("MUSICAL", DEEP_MAROON), ("TALENT", DEEP_MAROON)]:
         draw.text((center_x_for(line, f_h1), y), line, fill=color, font=f_h1)
         y += line_h
-    draw.text((center_x_for("SHOWCASE", f_h1), y), "SHOWCASE", fill=EMBER, font=f_h1)
+    draw.text((center_x_for("SHOWCASE", f_h1), y), "SHOWCASE", fill=DEEP_EMBER, font=f_h1)
     y += int(line_h * 1.1)
 
     # Tagline directly under the title — small caps in deep amber for
@@ -504,10 +508,9 @@ def render_portrait(W=BASE_W, H=BASE_H, headline_size=156):
     panel_top = y
     panel_h = int(360 * sf)
     panel_x1, panel_x2 = margin + int(80 * sf), W - margin - int(80 * sf)
-    # Slightly translucent panel — lets the singer silhouette show through
-    # if any part of her overlaps the panel area, while still keeping the
-    # cream/gold text readable.
-    draw.rectangle([panel_x1, panel_top, panel_x2, panel_top + panel_h], fill=MAROON + (215,))
+    # Translucent panel in DEEP_MAROON — richer fill that grounds the
+    # bottom of the poster and lets the singer show through if she overlaps.
+    draw.rectangle([panel_x1, panel_top, panel_x2, panel_top + panel_h], fill=DEEP_MAROON + (228,))
     draw.rectangle([panel_x1 + int(18 * sf), panel_top + int(18 * sf),
                     panel_x2 - int(18 * sf), panel_top + panel_h - int(18 * sf)],
                    outline=GOLD, width=2)
@@ -591,7 +594,7 @@ def render_portrait(W=BASE_W, H=BASE_H, headline_size=156):
     f_url = font("InstrumentSans-Bold.ttf", int(30 * sf))
     url = "www.nzmeltingpot.com"
     uw = draw.textlength(url, font=f_url)
-    draw.text(((W - uw) // 2, y), url, fill=MAROON, font=f_url)
+    draw.text(((W - uw) // 2, y), url, fill=DEEP_MAROON, font=f_url)
     y += int(60 * sf)
 
     draw.line([(margin + int(250 * sf), y), (W - margin - int(250 * sf), y)], fill=GOLD, width=1)

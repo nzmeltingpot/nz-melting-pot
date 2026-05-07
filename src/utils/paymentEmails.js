@@ -470,7 +470,7 @@ export function buildBuyerConfirmationEmail({ bookingData, attendeeNamesArr }) {
       </h3>
       <ul style="font-size:14px;line-height:1.7;color:#374151;padding-left:20px;margin:0 0 16px 0;">
         <li>Doors open at the time announced closer to the event.</li>
-        <li>A live show with vocalists, instrumentalists, duos and groups, judged by a community panel.</li>
+        <li>A live show featuring soloists, duets and trios — vocalists and instrumentalists from across Auckland.</li>
         <li>Family-friendly. All ages welcome.</li>
       </ul>
 

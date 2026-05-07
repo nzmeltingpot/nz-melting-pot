@@ -130,8 +130,8 @@ export default function About() {
                 <h3>Musical Talent Showcase</h3>
                 <p>
                   Our annual talent showcase gives performers of all ages and backgrounds the chance to take the stage.
-                  Vocalists, instrumentalists, bands, and groups — everyone is welcome to sign up and share their talent
-                  with live judges and an appreciative audience.
+                  Soloists, duets, and trios — vocalists and instrumentalists — everyone is welcome to sign up and share their talent
+                  with an appreciative community audience.
                 </p>
                 <Link to="/musical-talent-showcase" className="btn btn--outline">Learn More</Link>
               </div>

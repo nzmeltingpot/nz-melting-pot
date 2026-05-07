@@ -15,14 +15,14 @@ const showcaseAlts = [
 'Instrumentalist playing a guitar piece during the Musical Talent Showcase event',
 'Audience watching a live music performance at the NZ Melting Pot showcase',
 'Young musician performing a solo at the community talent showcase in Auckland',
-'Group performance on stage at the Auckland Musical Talent Showcase event',
-'Judge panel evaluating performers at the NZ Melting Pot Musical Talent Showcase',
+'Trio performance on stage at the Auckland Musical Talent Showcase event',
+'Audience watching performances at the NZ Melting Pot Musical Talent Showcase',
 'Drummer performing an energetic solo at the NZ Melting Pot talent event',
 'Guitarist on stage at the annual Musical Talent Showcase in Auckland',
 'Duo performing together at the NZ Melting Pot community talent showcase',
 'Full stage view of the Musical Talent Showcase performance venue in Auckland',
-'Vocalist receiving feedback from judges at the annual talent showcase',
-'Band performing live at the Auckland community music event',
+'Vocalist after performing at the annual talent showcase',
+'Duet performing live at the Auckland community music event',
 'Audience applauding after a performance at the NZ Melting Pot showcase',
 'Pianist performing a classical piece at the Musical Talent Showcase',
 'Award ceremony moment at the annual NZ Melting Pot Musical Talent Showcase'];
@@ -41,7 +41,7 @@ export default function TalentShowcase() {
   usePageMeta({
     title: 'Musical Talent Showcase 2026 — NZ Melting Pot Auckland',
     description:
-    "Register for Auckland's annual Musical Talent Showcase. Solo vocalists, instrumentalists, groups, and duets — all ages welcome. Live judges, Saturday 18 July 2026. Performer fee from $10 NZD per participant.",
+    "Register for Auckland's annual Musical Talent Showcase — a celebration, not a competition. Soloists, duets, and trios — vocalists and instrumentalists, all ages welcome. Saturday 18 July 2026. Performer fee from $10 NZD per participant.",
     path: '/musical-talent-showcase'
   });
 
@@ -73,7 +73,7 @@ export default function TalentShowcase() {
         <div className="container">
           <p className="text-accent page-hero__tag">Saturday 18 July 2026</p>
           <h1>Musical Talent<br />Showcase</h1>
-          <p>Auckland's annual stage for solo artists, instrumentalists, and groups. Sign up, show up, and let your music do the talking.</p>
+          <p>Auckland's annual stage for soloists, duets, and trios — vocalists and instrumentalists alike. Sign up, show up, and let your music do the talking.</p>
         </div>
         <div className="divider divider--bottom divider--tall">
           <svg viewBox="0 0 1440 90" preserveAspectRatio="none" fill="var(--color-white)">
@@ -180,7 +180,7 @@ export default function TalentShowcase() {
             <div className="event-info__text reveal-right" data-delay="150">
               <p className="text-accent">About the Event</p>
               <h2>Your turn on stage</h2>
-              <p>The Musical Talent Showcase is our flagship annual event — performers from across Auckland take the stage in front of a live audience and a panel of judges.</p>
+              <p>The Musical Talent Showcase is our flagship annual event — performers from across Auckland take the stage in front of a warm, welcoming community audience. It's a celebration of local talent, not a competition.</p>
 
               <div className="info-highlights">
                 <div className="info-highlight reveal" data-delay="100">
@@ -198,7 +198,7 @@ export default function TalentShowcase() {
                   </div>
                   <div>
                     <strong>Multiple Categories</strong>
-                    <p>Vocalists, instrumentalists, groups, duets, and more — plus age groups from under 12 to open.</p>
+                    <p>Vocalists and instrumentalists — soloists, duets, and trios — plus age categories from under 12 to open.</p>
                   </div>
                 </div>
                 <div className="info-highlight reveal" data-delay="260">
@@ -206,8 +206,8 @@ export default function TalentShowcase() {
                     <AnimatedIcon name="feedback" />
                   </div>
                   <div>
-                    <strong>Live Judging &amp; Feedback</strong>
-                    <p>Judges provide real feedback, the audience cheers you on, and we celebrate the best performances at the end of the day.</p>
+                    <strong>Warm, Encouraging Audience</strong>
+                    <p>The audience cheers every performer on, and we celebrate everyone who takes the stage at the end of the day.</p>
                   </div>
                 </div>
                 <div className="info-highlight reveal" data-delay="340">
@@ -215,14 +215,14 @@ export default function TalentShowcase() {
                     <AnimatedIcon name="handshake" />
                   </div>
                   <div>
-                    <strong>Competitive, But Community</strong>
-                    <p>It's a competition, sure. But everyone in the room showed up because they care about the same thing you do.</p>
+                    <strong>Showcase, Not Competition</strong>
+                    <p>It's a celebration of music and community. Everyone in the room is here because they care about the same thing you do — sharing the joy of performing.</p>
                   </div>
                 </div>
               </div>
 
               <ul className="categories-list" aria-label="Performance categories">
-                <li>Vocal Solo</li><li>Instrumental</li><li>Group</li><li>Duet</li>
+                <li>Vocal Solo</li><li>Instrumental</li><li>Duet</li><li>Trio</li>
                 <li>Under 12</li><li>12 – 17</li><li>18+</li><li>Open / Mixed</li>
               </ul>
             </div>
@@ -371,7 +371,7 @@ export default function TalentShowcase() {
           <div className="gallery-section__header reveal">
             <p className="text-accent">From Previous Years</p>
             <h2>Gallery</h2>
-            <p>Moments from the stage — performers, judges, and the crowd that makes it all happen.</p>
+            <p>Moments from the stage — performers and the crowd that makes it all happen.</p>
           </div>
           <div className="reveal" data-delay="100">
             <Gallery images={showcaseImages} />

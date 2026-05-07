@@ -460,7 +460,7 @@ def render_portrait(W=BASE_W, H=BASE_H, headline_size=156):
     # Tagline directly under the title — small caps in deep amber for
     # stronger contrast against the cream paper.
     f_tag = font("InstrumentSans-Bold.ttf", int(28 * sf))
-    tag_text = "LIVE  MUSIC  ·  LIVE  JUDGES  ·  LOCAL  TALENT"
+    tag_text = "LIVE  MUSIC  ·  LOCAL  TALENT  ·  ALL  AGES"
     tag_w = draw.textlength(tag_text, font=f_tag)
     draw.text(((W - tag_w) // 2, y), tag_text, fill=DEEP_AMBER, font=f_tag)
     y += int(50 * sf)

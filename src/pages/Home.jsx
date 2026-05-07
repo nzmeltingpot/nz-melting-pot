@@ -63,7 +63,7 @@ export default function Home() {
           <div className="register-section__header reveal">
             <p className="text-accent">Musical Talent Showcase 2026</p>
             <h2>Take the Stage</h2>
-            <p>Sign up to perform at this year's showcase. Solo artists, instrumentalists, groups — everyone's welcome.</p>
+            <p>Sign up to perform at this year's showcase. Soloists, duets, and trios — vocalists and instrumentalists — everyone's welcome.</p>
           </div>
           <div className="reveal" data-delay="150">
             <RegistrationForm idPrefix="home" />
@@ -107,7 +107,7 @@ export default function Home() {
                 <AnimatedIcon name="notes" />
               </div>
               <h3>Two Events, One Goal</h3>
-              <p className="">The <strong>Musical Talent Showcase</strong> is our flagship event with live judges and an audience. The <strong>Musical Ensemble</strong> is relaxed and collaborative — no auditions, no competition. Both are annual, and both are open to everyone.</p>
+              <p className="">The <strong>Musical Talent Showcase</strong> is our flagship event — a celebration of local talent on stage in front of a warm community audience. The <strong>Musical Ensemble</strong> is relaxed and collaborative — no auditions, no competition. Both are annual, and both are open to everyone.</p>
             </div>
             <div className="highlight-card reveal" data-delay="240">
               <div className="highlight-card__icon highlight-card__icon--gold">
@@ -140,7 +140,7 @@ export default function Home() {
               </div>
               <div className="event-card__body">
                 <h3>Musical Talent Showcase</h3>
-                <p>Performers sign up, pick a category, and take the stage in front of live judges and an audience. Vocalists, instrumentalists, bands — everyone's welcome.</p>
+                <p>Performers sign up, pick a category, and take the stage in front of a warm community audience. Soloists, duets, and trios — vocalists and instrumentalists — everyone's welcome.</p>
                 <span className="event-card__link">
                   Learn more &amp; register
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>

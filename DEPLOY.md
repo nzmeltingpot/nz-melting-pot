@@ -16,9 +16,13 @@ git push origin main
 
 Send them this short message:
 
-> **Please pull and sync from main.**
+> **Please pull and sync from main (commit `<sha>`). Confirm all files in this commit have been applied — run `git diff HEAD --stat` after, the output should be empty.**
+
+Replace `<sha>` with the latest commit hash (from `git log -1 --format=%h`).
 
 That's it. They'll fetch from GitHub and check out the frontend files into the live project. EzSite auto-deploys on the internal git change. Usually takes 1–2 minutes.
+
+**Why include the SHA + the verification step:** in the past their sync has occasionally only updated *some* files in a commit, leaving stale chunks for others. Giving them the commit SHA and asking them to confirm cleanly via `git diff` catches partial syncs.
 
 ---
 

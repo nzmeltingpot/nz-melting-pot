@@ -84,21 +84,82 @@ export default function TalentShowcase() {
 
       <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Musical Talent Showcase', to: '/musical-talent-showcase' }]} />
 
-      {/* Event Info — poster on the LEFT, "Your turn on stage" on the RIGHT */}
+      {/* Event Info — "Your turn on stage" on the LEFT, poster on the RIGHT.
+          Poster is sticky on desktop only (handled via CSS class) so the
+          left column's content doesn't overlap it on phones. */}
       <section className="event-info" id="poster">
+        <style>{`
+          @media (min-width: 1025px) {
+            .talent-poster-col {
+              position: sticky;
+              top: 20px;
+              align-self: start;
+            }
+          }
+        `}</style>
         <div className="container">
           <div className="event-info__grid" style={{ alignItems: 'flex-start' }}>
 
-            {/* LEFT — poster image + download buttons */}
+            {/* LEFT — Your turn on stage */}
+            <div className="event-info__text reveal-left" data-delay="150">
+              <p className="text-accent">About the Event</p>
+              <h2>Your turn on stage</h2>
+              <p>The Musical Talent Showcase is our flagship annual event — performers from across Auckland take the stage in front of a warm, welcoming community audience. It's a celebration of local talent, not a competition.</p>
+
+              <div className="info-highlights">
+                <div className="info-highlight reveal" data-delay="100">
+                  <div className="info-highlight__icon">
+                    <AnimatedIcon name="star" />
+                  </div>
+                  <div>
+                    <strong>Open Stage</strong>
+                    <p>First time or hundredth time — it doesn't matter. If you want to perform, there's a spot for you.</p>
+                  </div>
+                </div>
+                <div className="info-highlight reveal" data-delay="180">
+                  <div className="info-highlight__icon">
+                    <AnimatedIcon name="grid" />
+                  </div>
+                  <div>
+                    <strong>Multiple Categories</strong>
+                    <p>Vocalists and instrumentalists — soloists, duets, and trios — plus age categories from under 12 to open.</p>
+                  </div>
+                </div>
+                <div className="info-highlight reveal" data-delay="260">
+                  <div className="info-highlight__icon">
+                    <AnimatedIcon name="feedback" />
+                  </div>
+                  <div>
+                    <strong>Warm, Encouraging Audience</strong>
+                    <p>The audience cheers every performer on, and we celebrate everyone who takes the stage at the end of the day.</p>
+                  </div>
+                </div>
+                <div className="info-highlight reveal" data-delay="340">
+                  <div className="info-highlight__icon">
+                    <AnimatedIcon name="handshake" />
+                  </div>
+                  <div>
+                    <strong>Showcase, Not Competition</strong>
+                    <p>It's a celebration of music and community. Everyone in the room is here because they care about the same thing you do — sharing the joy of performing.</p>
+                  </div>
+                </div>
+              </div>
+
+              <ul className="categories-list" aria-label="Performance categories">
+                <li>Vocal Solo</li><li>Instrumental</li><li>Duet</li><li>Trio</li>
+                <li>Under 12</li><li>12 – 17</li><li>18+</li><li>Open / Mixed</li>
+              </ul>
+            </div>
+
+            {/* RIGHT — poster image + share buttons (sticky on desktop only,
+                 normal flow on mobile so it doesn't overlap the left column) */}
             <div
-              className="reveal-left"
+              className="reveal-right talent-poster-col"
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 16,
-                position: 'sticky',
-                top: 20
+                gap: 16
               }}>
 
               <a
@@ -174,57 +235,6 @@ export default function TalentShowcase() {
                   Share via Email
                 </a>
               </div>
-            </div>
-
-            {/* RIGHT — Your turn on stage */}
-            <div className="event-info__text reveal-right" data-delay="150">
-              <p className="text-accent">About the Event</p>
-              <h2>Your turn on stage</h2>
-              <p>The Musical Talent Showcase is our flagship annual event — performers from across Auckland take the stage in front of a warm, welcoming community audience. It's a celebration of local talent, not a competition.</p>
-
-              <div className="info-highlights">
-                <div className="info-highlight reveal" data-delay="100">
-                  <div className="info-highlight__icon">
-                    <AnimatedIcon name="star" />
-                  </div>
-                  <div>
-                    <strong>Open Stage</strong>
-                    <p>First time or hundredth time — it doesn't matter. If you want to perform, there's a spot for you.</p>
-                  </div>
-                </div>
-                <div className="info-highlight reveal" data-delay="180">
-                  <div className="info-highlight__icon">
-                    <AnimatedIcon name="grid" />
-                  </div>
-                  <div>
-                    <strong>Multiple Categories</strong>
-                    <p>Vocalists and instrumentalists — soloists, duets, and trios — plus age categories from under 12 to open.</p>
-                  </div>
-                </div>
-                <div className="info-highlight reveal" data-delay="260">
-                  <div className="info-highlight__icon">
-                    <AnimatedIcon name="feedback" />
-                  </div>
-                  <div>
-                    <strong>Warm, Encouraging Audience</strong>
-                    <p>The audience cheers every performer on, and we celebrate everyone who takes the stage at the end of the day.</p>
-                  </div>
-                </div>
-                <div className="info-highlight reveal" data-delay="340">
-                  <div className="info-highlight__icon">
-                    <AnimatedIcon name="handshake" />
-                  </div>
-                  <div>
-                    <strong>Showcase, Not Competition</strong>
-                    <p>It's a celebration of music and community. Everyone in the room is here because they care about the same thing you do — sharing the joy of performing.</p>
-                  </div>
-                </div>
-              </div>
-
-              <ul className="categories-list" aria-label="Performance categories">
-                <li>Vocal Solo</li><li>Instrumental</li><li>Duet</li><li>Trio</li>
-                <li>Under 12</li><li>12 – 17</li><li>18+</li><li>Open / Mixed</li>
-              </ul>
             </div>
           </div>
 

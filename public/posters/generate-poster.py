@@ -64,24 +64,26 @@ def apply_edits(img):
     d.text((x_pos, Y(1148)), new_text, fill=BLUE, font=f_gate)
 
     # --- 2. Sponsor credit ---
-    # Single small line just below the address. We mask only behind the
-    # text itself (a tight "pill" sized to the text width), not the full
-    # poster width, so we don't introduce a visible cream strip across
-    # the bottom decorations.
-    f_sp = font("InstrumentSans-Bold.ttf", S(15))
+    # Small bold line tucked just below "www.nzmeltingpot.com" and above
+    # the "GATES OPEN" line. Centred under the URL text (URL text spans
+    # x=241-571 in the original image; centre x≈406), not under the page
+    # centre, so it sits visually beneath the URL rather than off to the
+    # right of it.
+    f_sp = font("WorkSans-Bold.ttf", S(15))
     sp_text = "PROUDLY SUPPORTED BY  •  JR FINANCE  —  CREATE WEALTH"
     sw = d.textlength(sp_text, font=f_sp)
-    sp_x = (W - sw) // 2
-    sp_y = Y(1308)
-    pad_x = S(10)
-    pad_y = S(4)
-    text_h = S(20)
+    url_cx = X(406)
+    sp_x = url_cx - sw // 2
+    sp_y = Y(1124)
+    pad_x = S(8)
+    pad_y = S(3)
+    text_h = S(19)
     d.rectangle(
         (sp_x - pad_x, sp_y - pad_y,
          sp_x + sw + pad_x, sp_y + text_h + pad_y),
         fill=CREAM,
     )
-    d.text((sp_x, sp_y), sp_text, fill=MUTED, font=f_sp)
+    d.text((sp_x, sp_y), sp_text, fill=DARK, font=f_sp)
 
 
 def get_main_image():

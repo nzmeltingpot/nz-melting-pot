@@ -1,5 +1,13 @@
 # Deploying changes to nzmeltingpot.com
 
+## Where to drive this from
+
+- **Step 1 (`git push`)** has to happen in a terminal — Claude Code, VS Code, or any shell.
+- **Step 2 (message the EzSite assistant)** can be done from either Claude Code or the
+  Claude desktop app project `NZ Melting Pot — Deploy`. The desktop project has the
+  GitHub connector wired up, so it can fetch the latest SHA and pre-fill the EzSite
+  message for you — handy when you're not at a terminal.
+
 ## The two-step workflow
 
 After making changes locally:

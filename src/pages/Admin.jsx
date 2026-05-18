@@ -503,6 +503,21 @@ export default function Admin() {
       }
       // Filter to only active members with valid emails
       recipients = recipients.filter((m) => m.status !== 'unsubscribed' && m.email);
+
+      // Deduplicate by email (case-insensitive, trimmed) so the same address
+      // never receives the same newsletter twice if the database has duplicates.
+      const seenEmails = new Set();
+      const beforeDedup = recipients.length;
+      recipients = recipients.filter((m) => {
+        const key = (m.email || '').trim().toLowerCase();
+        if (!key || seenEmails.has(key)) return false;
+        seenEmails.add(key);
+        return true;
+      });
+      const removed = beforeDedup - recipients.length;
+      if (removed > 0) {
+        console.log(`📨 [Brevo] Deduped ${removed} duplicate email row${removed === 1 ? '' : 's'} (kept ${recipients.length} unique recipients)`);
+      }
     } catch (err) {
       console.error('Failed to load selected members:', err);
       setSendingEmail(false);

@@ -485,22 +485,42 @@ export default function Admin() {
     setSendingEmail(true);
     setEmailResult(null);
 
-    // Fetch all selected members from database (not just current page)
+    // Fetch ALL active members across all pages, then filter to only the
+    // ones the user selected (by ID set). We do client-side filtering
+    // because Ezsite's tablePage `Filters: InList` operator isn't reliable —
+    // an earlier attempt to use it silently returned the first page of
+    // members instead of the requested IDs, causing emails to go to the
+    // wrong recipients. This approach is safer: we know exactly who's
+    // getting the email because we explicitly check each ID locally.
     let recipients = [];
     try {
-      const selectedIds = Array.from(selectedMembers);
-      // Fetch members in batches of 50
-      for (let i = 0; i < selectedIds.length; i += 50) {
-        const batchIds = selectedIds.slice(i, i + 50);
+      const selectedIdsSet = new Set(Array.from(selectedMembers).map(String));
+      let page = 1;
+      let hasMore = true;
+      while (hasMore) {
         const { data, error } = await window.ezsite.apis.tablePage(MEMBERS_TABLE_ID, {
-          PageNo: 1,
-          PageSize: 50,
-          Filters: [{ Name: 'ID', Op: 'InList', Value: batchIds.join(',') }]
+          PageNo: page,
+          PageSize: 100,
+          OrderByField: 'ID',
+          IsAsc: true
         });
-        if (!error && data?.List) {
-          recipients = recipients.concat(data.List);
+        if (error || !data?.List?.length) {
+          hasMore = false;
+        } else {
+          // Filter this page to only members whose IDs are in selectedIdsSet
+          const matches = data.List.filter((m) => {
+            const id = String(m.id ?? m.ID ?? '');
+            return selectedIdsSet.has(id);
+          });
+          recipients = recipients.concat(matches);
+          page++;
+          hasMore = data.List.length === 100;
+          // Stop early if we've found everyone we were looking for
+          if (recipients.length >= selectedIdsSet.size) hasMore = false;
         }
       }
+      console.log(`📨 [Members] Selected ${selectedIdsSet.size} ID(s), matched ${recipients.length} member row(s)`);
+
       // Filter to only active members with valid emails
       recipients = recipients.filter((m) => m.status !== 'unsubscribed' && m.email);
 
